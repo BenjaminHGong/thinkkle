@@ -27,10 +27,8 @@
     font-size: 4vmin;
     font-family: Arial, Helvetica, sans-serif;
     user-select: text;
-}
-/*Centering the caret*/
-.board div:empty::before {
-    content: "\00a0"; 
+    caret-color: transparent; /* Hide caret */
+    outline: none;
 }
 /* Add hover effect */
 .board div:focus {
