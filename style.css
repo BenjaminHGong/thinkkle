@@ -23,4 +23,5 @@
     background-color: bisque;
     font-size: 4vmin;
     font-family: Arial, Helvetica, sans-serif;
+    user-select: text;
 }
