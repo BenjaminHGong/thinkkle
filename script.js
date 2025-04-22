@@ -14,6 +14,14 @@ document.querySelectorAll('.board div').forEach(cell => {
     cell.addEventListener('paste', (e) => {
       e.preventDefault();
     });
+
+    //Delete cell content on Backspace or Delete key press
+    cell.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" || e.key === "Delete") {
+          cell.textContent = "";
+          e.preventDefault();    
+        }
+    });
   });
 
 
