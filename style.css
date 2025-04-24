@@ -15,16 +15,17 @@
 }
 /* Board dimensions */
 .board {
-    
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
     width: 75vmin;
     height: 75vmin;
     margin: auto;
+    border: 3px solid #000;
 }
 /* Cell style */
 .board div {
-    width: calc(100% / 15);
-    height: calc(100% / 15);
-    float: left;
+    line-height: 1;
     align-items: center;
     justify-content: center;
     display: flex;

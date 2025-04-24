@@ -1,9 +1,25 @@
+const board = document.querySelector('.board');
+
+// Assuming a 15x15 board
+const rowLength = 15 
+const columnLength = 15
+
+for (let row = 0; row < rowLength; row++) {
+    for (let col = 0; col < columnLength; col++) {
+        const tile = document.createElement('div');
+
+        // Put the star at the center
+        if (row === 7 && col === 7) {
+            tile.textContent = '★';
+        }
+
+        board.appendChild(tile);
+    }
+}
+
 const cells = document.querySelectorAll(".board div"); //Array of all cells in the board
 
 document.querySelectorAll('.board div').forEach(cell => {
-
-    const rowLength = 15 // Assuming a 15x15 board
-    
     cell.addEventListener('beforeinput', (e) => {
         // Allow deletions, line breaks, etc.
         if (e.inputType.startsWith("delete") || e.inputType === "insertLineBreak") return;
