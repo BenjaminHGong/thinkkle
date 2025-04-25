@@ -148,10 +148,9 @@ squares.forEach(square => {
     // Delete cell content on Backspace or Delete key press
     tile.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
-            const wordBonus = tile.dataset.wordBonus;
             square.classList.add('empty'); // Add empty class back when cleared
             square.classList.remove('filled'); // Remove filled class when cleared
-            tile.textContent = wordBonus || "";
+            tile.textContent = "";
             e.preventDefault(); 
         }
     });
