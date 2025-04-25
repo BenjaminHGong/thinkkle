@@ -3,16 +3,19 @@
     margin: 0;
     padding: 0;
 }
+
 .center {
     margin-left: auto;
     margin-right: auto;
 }
+
 .title {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
     margin: 2vh;
     font-size: 5vmin;
 }
+
 /* Board style */
 .board {
     display: grid;
@@ -21,19 +24,70 @@
     width: 75vmin;
     height: 75vmin;
     margin: auto;
-    border: 3px solid #000;
+    border: 0.5vmin solid #000;
 }
-/* Cell style */
-.board div {
-    line-height: 1;
+
+/* Square and tile style */
+.tile, .tile-back, .square {
+    width: 100%;
+    height: 100%;
+    display: flex;
     align-items: center;
     justify-content: center;
-    display: flex;
-    border: 1px solid #000;
     font-family: Arial, Helvetica, sans-serif;
-    user-select: text;
+}
+
+.square {
+    position: relative;
+    overflow: visible;
+    line-height: 1;
+    border: 0.1vmin solid rgb(204, 183, 158);
+    user-select: none;
     caret-color: transparent; /* Hide caret */
     outline: none;
+}
+
+.tile, .tile-back {
+    position: absolute;
+    z-index: 1;
+    border-radius: 20%; /* Circular tile */
+}
+
+.square.empty .tile, .square.empty .tile-back {
+    background-color: transparent; /* Transparent for empty tiles */
+    outline: none;
+}
+
+.tile {
+    background-color: rgb(252, 202, 50);
+    bottom: 5%;
+}
+
+.tile-back {
+    background-color: rgb(141, 114, 33);
+    top: 3%;
+}
+
+/* Add tile hover and focus effect */
+.square.empty:hover {
+    outline: 3px solid dodgerblue;
+    outline-offset: -3px;
+}
+
+.square.empty:focus-within{
+    outline: 3px solid dodgerblue;
+    outline-offset: -3px;
+}
+
+.square.filled:hover .tile, .square.filled:hover .tile-back {
+    transform: scale(1.1);
+    z-index: 2;
+}
+
+.square.filled .tile:focus {
+    outline: 3px solid dodgerblue;
+    outline-offset: -2px;
+    z-index: 2;
 }
 
 .normal {
@@ -47,12 +101,12 @@
 }
 
 .triple-word {
-    background-color: red;
+    background-color: rgb(255, 54, 54);
     font-size: 2vmin;
 }
 
 .double-letter {
-    background-color: lightcyan; 
+    background-color: rgb(196, 250, 250); 
     font-size: 2vmin;
 }
 
@@ -61,15 +115,8 @@
     font-size: 2vmin;
 }
 
-/* Star cell style */
 .star {
     background-color: lightsalmon; 
     font-size: 4vmin; 
-}
-
-/* Add hover effect */
-.board div:focus {
-    outline: 2px solid dodgerblue; /* Full cell outline */
-    outline-offset: -2px; /* Tight to the cell border */
 }
 
