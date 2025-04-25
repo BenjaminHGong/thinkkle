@@ -1,0 +1,75 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+.title {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 2vh;
+    font-size: 5vmin;
+}
+/* Board style */
+.board {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    width: 75vmin;
+    height: 75vmin;
+    margin: auto;
+    border: 3px solid #000;
+}
+/* Cell style */
+.board div {
+    line-height: 1;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    border: 1px solid #000;
+    font-family: Arial, Helvetica, sans-serif;
+    user-select: text;
+    caret-color: transparent; /* Hide caret */
+    outline: none;
+}
+
+.normal {
+    background-color: bisque;
+    font-size: 4vmin;
+}
+
+.double-word {
+    background-color: lightsalmon; 
+    font-size: 2vmin;
+}
+
+.triple-word {
+    background-color: red;
+    font-size: 2vmin;
+}
+
+.double-letter {
+    background-color: lightcyan; 
+    font-size: 2vmin;
+}
+
+.triple-letter {
+    background-color: cyan; 
+    font-size: 2vmin;
+}
+
+/* Star cell style */
+.star {
+    background-color: gold; 
+    font-size: 4vmin; 
+}
+
+/* Add hover effect */
+.board div:focus {
+    outline: 2px solid dodgerblue; /* Full cell outline */
+    outline-offset: -2px; /* Tight to the cell border */
+}
+
