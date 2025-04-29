@@ -77,6 +77,34 @@ const specialSquares = [
     { row: 13, col: 9, type: 'triple-letter' }
 ];
 
+const indicator = document.getElementById('direction-indicator');
+let currentDirection = 'right'; // Default direction
+indicator.classList.add(currentDirection); // Set default direction
+
+function moveIndicator(tile, direction) {
+    const square = tile.closest('.square');
+    const rect = square.getBoundingClientRect();
+    let top = rect.top + window.scrollY || document.documentElement.scrollTop;
+    let left = rect.left + window.scrollX || document.documentElement.scrollLeft;
+    
+    const size = rect.width;
+
+    indicator.className = ''; // reset
+    indicator.classList.add(direction);
+    indicator.style.display = 'block';
+
+    if (direction === 'right') {
+        top += size / 2;
+        left += size;
+    } else if (direction === 'down') {
+        top += size;
+        left += size / 2;
+    }
+
+    indicator.style.top = `${top}px`;
+    indicator.style.left = `${left}px`;
+}
+
 for (let row = 0; row < rowLength; row++) {
     
     for (let col = 0; col < columnLength; col++) {
@@ -148,10 +176,11 @@ squares.forEach(square => {
     // Delete cell content on Backspace or Delete key press
     tile.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
+            e.preventDefault(); 
             square.classList.add('empty'); // Add empty class back when cleared
             square.classList.remove('filled'); // Remove filled class when cleared
             tile.textContent = "";
-            e.preventDefault(); 
+            
         }
     });
 
@@ -163,10 +192,32 @@ squares.forEach(square => {
         let newRow = currentRow;
         let newCol = currentCol;
     
-        if (e.key === 'ArrowUp') newRow--;
-        else if (e.key === 'ArrowDown') newRow++;
-        else if (e.key === 'ArrowLeft') newCol--;
-        else if (e.key === 'ArrowRight') newCol++;
+        if (e.key === 'ArrowUp') {
+            currentDirection = 'down';
+            newRow--;
+        }
+        else if (e.key === 'ArrowDown') {
+            if (currentDirection === 'down') {
+                newRow++;
+            }
+            else {
+                currentDirection = 'down';
+                moveIndicator(tile, currentDirection);
+            }
+        } 
+        else if (e.key === 'ArrowLeft') {
+            currentDirection = 'right'
+            newCol--;
+        }
+        else if (e.key === 'ArrowRight') {
+            if (currentDirection === 'right') {
+                newCol++;
+            }
+            else {
+                currentDirection = 'right';
+                moveIndicator(tile, currentDirection);
+            }
+        }
         else return;
     
         e.preventDefault(); // Stop default scrolling
@@ -194,7 +245,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 square.classList.remove('empty'); // Remove empty class when a letter is added
                 square.classList.add('filled'); // Add filled class when a letter is added
+                const currentRow = parseInt(tile.dataset.row);
+                const currentCol = parseInt(tile.dataset.col);
+                let nextTile;
+                if (currentDirection === 'right') {
+                    nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol + 1}']`);
+                } 
+                else if (currentDirection === 'down') {
+                    nextTile = document.querySelector(`.tile[data-row='${currentRow + 1}'][data-col='${currentCol}']`);
+                }
+
+                if (nextTile) {
+                    nextTile.focus();
+                    moveIndicator(nextTile, currentDirection);
+                }
+            });
+            tile.addEventListener('focus', () => {
+                moveIndicator(tile, currentDirection);
             });
         }
     });
-  });
+});
+
+window.addEventListener('resize', () => {
+    const focused = document.activeElement;
+    if (focused && focused.classList.contains('tile')) {
+        moveIndicator(focused, currentDirection);
+    }
+});

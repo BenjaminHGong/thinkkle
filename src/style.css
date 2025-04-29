@@ -42,12 +42,13 @@
     overflow: visible;
     line-height: 1;
     border: 0.1vmin solid rgb(204, 183, 158);
-    user-select: none;
     caret-color: transparent; /* Hide caret */
     outline: none;
 }
 
 .tile, .tile-back {
+    user-select: none; /* Prevent text selection */
+    -webkit-user-drag: none;
     position: absolute;
     z-index: 1;
     border-radius: 20%; /* Circular tile */
@@ -120,3 +121,21 @@
     font-size: 4vmin; 
 }
 
+#direction-indicator {
+    display: none;
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 3;
+    border: 1vmin solid transparent;
+}
+
+#direction-indicator.right {
+    border-left-color: dodgerblue;
+    transform: translate(10%, -50%);
+}
+#direction-indicator.down {
+    border-top-color: dodgerblue;
+    transform: translate(-50%, 10%);
+}
