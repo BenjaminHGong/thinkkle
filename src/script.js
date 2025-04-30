@@ -103,10 +103,14 @@ function moveIndicator(tile, direction) {
 
     indicator.style.top = `${top}px`;
     indicator.style.left = `${left}px`;
+    indicator.style.visibility = 'visible'; // Show the indicator
+}
+
+function hideIndicator() {
+    indicator.style.visibility = 'hidden';
 }
 
 for (let row = 0; row < rowLength; row++) {
-    
     for (let col = 0; col < columnLength; col++) {
         const square = document.createElement('div');
         const specialSquare = specialSquares.find(t => t.row === row && t.col === col);
@@ -227,6 +231,10 @@ squares.forEach(square => {
     
         const nextTile = document.querySelector(`.tile[data-row='${newRow}'][data-col='${newCol}']`);
         if (nextTile) nextTile.focus();
+    });
+
+    tile.addEventListener('blur', () => {
+        hideIndicator(); // Hide the indicator when the tile loses focus
     });
 });
 
