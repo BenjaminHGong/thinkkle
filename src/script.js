@@ -172,6 +172,11 @@ squares.forEach(square => {
         }
     });
 
+    // Prevent dragging and dropping text into the tile
+    tile.addEventListener('dragstart', (e) => {
+        e.preventDefault();
+    });
+
     // Prevent pasting
     tile.addEventListener('paste', (e) => {
         e.preventDefault();

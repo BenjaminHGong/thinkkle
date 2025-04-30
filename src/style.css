@@ -47,6 +47,7 @@
 }
 
 .tile, .tile-back {
+    -webkit-user-select: auto;
     user-select: none; /* Prevent text selection */
     -webkit-user-drag: none;
     position: absolute;
