@@ -188,8 +188,20 @@ squares.forEach(square => {
             e.preventDefault(); 
             square.classList.add('empty'); // Add empty class back when cleared
             square.classList.remove('filled'); // Remove filled class when cleared
+            const currentRow = parseInt(tile.dataset.row);
+            const currentCol = parseInt(tile.dataset.col);
             tile.textContent = "";
-            
+            let nextTile;
+            if (currentDirection === 'right') {
+                nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol - 1}']`);
+            } 
+            else if (currentDirection === 'down') {
+                nextTile = document.querySelector(`.tile[data-row='${currentRow - 1}'][data-col='${currentCol}']`);
+            }
+            if (nextTile) {
+                nextTile.focus();
+                moveIndicator(nextTile, currentDirection);
+            }
         }
     });
 
