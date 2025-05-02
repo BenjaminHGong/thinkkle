@@ -28,7 +28,7 @@
 }
 
 /* Square and tile style */
-.tile, .tile-back, .square {
+.tile, .square {
     width: 100%;
     height: 100%;
     display: flex;
@@ -46,29 +46,26 @@
     outline: none;
 }
 
-.tile, .tile-back {
+.tile {
     -webkit-user-select: auto;
     user-select: none; /* Prevent text selection */
     -webkit-user-drag: none;
     position: absolute;
     z-index: 1;
     border-radius: 20%; /* Circular tile */
-}
-
-.square.empty .tile, .square.empty .tile-back {
-    background-color: transparent; /* Transparent for empty tiles */
-    outline: none;
-}
-
-.tile {
     background-color: rgb(252, 202, 50);
     bottom: 5%;
 }
 
-.tile-back {
-    background-color: rgb(141, 114, 33);
-    top: 3%;
+.tile.shadow {
+    box-shadow: 0 0.1em rgb(141, 114, 33);
 }
+
+.square.empty .tile {
+    background-color: transparent; /* Transparent for empty tiles */
+    outline: none;
+}
+
 
 /* Add tile hover and focus effect */
 .square.empty:hover {
@@ -139,4 +136,25 @@
 #direction-indicator.down {
     border-top-color: dodgerblue;
     transform: translate(-50%, 10%);
+}
+
+.rack {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2vh auto;
+    width: 50vmin;
+    height: 8vmin;
+    background-color: bisque;
+    border: 0.5vmin solid #000;
+    border-radius: 1vmin;
+    padding: 1vmin;
+    gap: 1vmin;
+}
+
+.rack .tile {
+    width: 6vmin;
+    height: 6vmin;
+    font-size: 4.8vmin;
+    position: relative;
 }

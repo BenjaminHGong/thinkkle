@@ -77,6 +77,107 @@ const specialSquares = [
     { row: 13, col: 9, type: 'triple-letter' }
 ];
 
+let tileBag = {
+    'A': 8, 
+    'B': 2, 
+    'C': 4, 
+    'D': 4, 
+    'E': 11,
+    'F': 2,
+    'G': 3,
+    'H': 2,
+    'I': 9,
+    'J': 1,
+    'K': 1,
+    'L': 5,
+    'M': 3,
+    'N': 7,
+    'O': 8,
+    'P': 3,
+    'Q': 1,
+    'R': 7,
+    'S': 9,
+    'T': 7,
+    'U': 3,
+    'V': 1,
+    'W': 1,
+    'X': 1,
+    'Y': 2,
+    'Z': 1
+};
+
+const tileValues = {
+    'A': 1, 
+    'B': 4, 
+    'C': 2, 
+    'D': 2, 
+    'E': 1,
+    'F': 6,
+    'G': 2,
+    'H': 4,
+    'I': 1,
+    'J': 10,
+    'K': 6,
+    'L': 1,
+    'M': 2,
+    'N': 1,
+    'O': 1,
+    'P': 2,
+    'Q': 10,
+    'R': 1,
+    'S': 1,
+    'T': 1,
+    'U': 2,
+    'V': 6,
+    'W': 6,
+    'X': 10,
+    'Y': 4,
+    'Z': 8
+}
+
+function drawRack() {
+    const rack = document.querySelector('.rack');
+    rack.innerHTML = ''; // Clear the rack
+    const letters = Object.keys(tileBag);
+    const rackLetters = [];
+
+    for (let i = 0; i < 7; i++) {
+        if (letters.length === 0) break; // Stop if the bag is empty
+
+        // Pick a random letter
+        const randomIndex = Math.floor(Math.random() * letters.length);
+        const letter = letters[randomIndex];
+
+        // Add the letter to the rack and decrement its count in the tile bag
+        rackLetters.push(letter);
+        tileBag[letter]--;
+        if (tileBag[letter] === 0) {
+            letters.splice(randomIndex, 1); // Remove letter if count reaches 0
+        }
+
+        const tile = document.createElement('div');
+        tile.classList.add('tile');
+        tile.classList.add('shadow'); // Class for rack tiles
+        tile.textContent = letter;
+
+        rack.appendChild(tile);
+    }
+
+    return rackLetters;
+}
+
+function addTileToRack(letter) {
+    const rack = document.querySelector('.rack');
+    const newTile = document.createElement('div');
+    newTile.classList.add('tile');
+    newTile.classList.add('shadow'); // Class for rack tiles
+    newTile.textContent = letter;
+    rack.appendChild(newTile);
+    rackLetters.push(letter); // Add the letter back to the rackLetters array
+}
+
+let rackLetters = drawRack();
+
 const indicator = document.getElementById('direction-indicator');
 let currentDirection = 'right'; // Default direction
 indicator.classList.add(currentDirection); // Set default direction
@@ -141,14 +242,11 @@ for (let row = 0; row < rowLength; row++) {
             square.classList.add('normal'); // Add a class for normal squares
         }
 
-        const tileBack = document.createElement('div');
-        tileBack.classList.add('tile-back');
 
         const tile = document.createElement('div');
         tile.classList.add('tile'); // Class for the tile
         tile.dataset.row = row;
         tile.dataset.col = col;
-        square.appendChild(tileBack);
         square.appendChild(tile);
         board.appendChild(square);
     }
@@ -161,13 +259,21 @@ squares.forEach(square => {
     tile.addEventListener('beforeinput', (e) => {
         // Allow deletions, line breaks, etc.
         if (e.inputType.startsWith("delete") || e.inputType === "insertLineBreak") return;
-        
+
         // If input is a single alphabetical character, allow it
-        const text = e.data;
-        if (!/^[a-zA-Z]$/.test(text)) {
+        const text = e.data?.toUpperCase();
+        const letter = tile.textContent;
+        if (!rackLetters.includes(text)) {
             e.preventDefault(); // Block input
-        }
-        else {
+        } else {
+            const index = rackLetters.indexOf(text);
+            if (index !== -1) {
+                rackLetters.splice(index, 1); // Remove from rackLetters
+                const rackTile = document.querySelector(`.rack .tile:nth-child(${index + 1})`);
+                if (rackTile) rackTile.remove(); // Remove from the rack display
+                if (letter) addTileToRack(letter); // Add the letter back to the rack if it was already there
+            }
+            
             tile.textContent = ""; // Clear the cell before setting the new value
         }
     });
@@ -188,8 +294,11 @@ squares.forEach(square => {
             e.preventDefault(); 
             square.classList.add('empty'); // Add empty class back when cleared
             square.classList.remove('filled'); // Remove filled class when cleared
+            tile.classList.remove('shadow');
             const currentRow = parseInt(tile.dataset.row);
             const currentCol = parseInt(tile.dataset.col);
+            const letter = tile.textContent;
+            if (letter) addTileToRack(letter); // Add the letter back to the rack
             tile.textContent = "";
             let nextTile;
             if (currentDirection === 'right') {
@@ -227,7 +336,7 @@ squares.forEach(square => {
             }
         } 
         else if (e.key === 'ArrowLeft') {
-            currentDirection = 'right'
+            currentDirection = 'right';
             newCol--;
         }
         else if (e.key === 'ArrowRight') {
@@ -263,13 +372,15 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tile) {
             tile.contentEditable = true;
             tile.addEventListener("input", () => {
+                
                 tile.textContent = tile.textContent.slice(0, 1).toUpperCase();
-                const letter = tile.textContent
+                const letter = tile.textContent;
                 if (letter) {
                     tile.style.fontSize = "4vmin";
                 }
                 square.classList.remove('empty'); // Remove empty class when a letter is added
                 square.classList.add('filled'); // Add filled class when a letter is added
+                tile.classList.add('shadow');
                 const currentRow = parseInt(tile.dataset.row);
                 const currentCol = parseInt(tile.dataset.col);
                 let nextTile;
@@ -294,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.addEventListener('resize', () => {
     const focused = document.activeElement;
-    if (focused && focused.classList.contains('tile')) {
+    if (focused?.classList.contains('tile')) {
         moveIndicator(focused, currentDirection);
     }
 });
