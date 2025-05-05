@@ -135,13 +135,22 @@ const tileValues = {
     'Z': 8
 }
 
+const dictionary = new Set();
+fetch('wordlist.txt')
+    .then(response => response.text())
+    .then(data => {
+        const words = data.split('\n').map(word => word.trim());
+        words.forEach(word => dictionary.add(word));
+    })
+    .catch(error => console.error('Error loading word list:', error));
+
 function drawRack() {
     const rack = document.querySelector('.rack');
     rack.innerHTML = ''; // Clear the rack
     const letters = Object.keys(tileBag);
     const rackLetters = [];
 
-    for (let i = 0; i < 7; i++) {
+    while (rackLetters.length < 7) {
         if (letters.length === 0) break; // Stop if the bag is empty
 
         // Pick a random letter
@@ -294,6 +303,7 @@ squares.forEach(square => {
             e.preventDefault(); 
             square.classList.add('empty'); // Add empty class back when cleared
             square.classList.remove('filled'); // Remove filled class when cleared
+            tile.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             tile.classList.remove('shadow');
             const currentRow = parseInt(tile.dataset.row);
             const currentCol = parseInt(tile.dataset.col);
@@ -372,7 +382,6 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tile) {
             tile.contentEditable = true;
             tile.addEventListener("input", () => {
-                
                 tile.textContent = tile.textContent.slice(0, 1).toUpperCase();
                 const letter = tile.textContent;
                 if (letter) {
@@ -381,15 +390,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 square.classList.remove('empty'); // Remove empty class when a letter is added
                 square.classList.add('filled'); // Add filled class when a letter is added
                 tile.classList.add('shadow');
+
                 const currentRow = parseInt(tile.dataset.row);
                 const currentCol = parseInt(tile.dataset.col);
+
                 let nextTile;
                 if (currentDirection === 'right') {
                     nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol + 1}']`);
                 } 
                 else if (currentDirection === 'down') {
                     nextTile = document.querySelector(`.tile[data-row='${currentRow + 1}'][data-col='${currentCol}']`);
-                }
+                }                
 
                 if (nextTile) {
                     nextTile.focus();
