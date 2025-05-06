@@ -1,46 +1,8 @@
-import { getRackLetters, setRackLetters, addTileToRack } from "./rack.js"; 
+import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
+import { getRackLetters, setRackLetters, addTileToRack } from "./rack.js"; // Import rack functions
+import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
+
 const squares = document.querySelectorAll(".square"); //Array of all cells in the board
-
-const indicator = document.getElementById('direction-indicator');
-let currentDirection = 'right'; // Default direction
-indicator.classList.add(currentDirection); // Set default direction
-
-function moveIndicator(tile, direction) {
-    const square = tile.closest('.square');
-    const rect = square.getBoundingClientRect();
-    let top = rect.top + window.scrollY || document.documentElement.scrollTop;
-    let left = rect.left + window.scrollX || document.documentElement.scrollLeft;
-    
-    const size = rect.width;
-
-    indicator.className = ''; // reset
-    indicator.classList.add(direction);
-    indicator.style.display = 'block';
-
-    if (direction === 'right') {
-        top += size / 2;
-        left += size;
-    } else if (direction === 'down') {
-        top += size;
-        left += size / 2;
-    }
-
-    indicator.style.top = `${top}px`;
-    indicator.style.left = `${left}px`;
-    indicator.style.visibility = 'visible'; // Show the indicator
-}
-
-function hideIndicator() {
-    indicator.style.visibility = 'hidden';
-}
-
-window.addEventListener('resize', () => {
-    const focused = document.activeElement;
-    if (focused?.classList.contains('tile')) {
-        moveIndicator(focused, currentDirection);
-    }
-});
-
 
 squares.forEach(square => {
     const tile = square.querySelector('.tile');
@@ -84,6 +46,7 @@ squares.forEach(square => {
         const currentCol = parseInt(tile.dataset.col);
 
         let nextTile;
+        const currentDirection = getDirection(); // Get the current direction from the indicator module
         if (currentDirection === 'right') {
             nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol + 1}']`);
         } 
@@ -93,12 +56,12 @@ squares.forEach(square => {
 
         if (nextTile) {
             nextTile.focus();
-            moveIndicator(nextTile, currentDirection);
+            moveIndicator(nextTile);
         }
     });
 
     tile.addEventListener('focus', () => {
-        moveIndicator(tile, currentDirection);
+        moveIndicator(tile);
     });
 
     // Prevent dragging and dropping text into the tile
@@ -121,6 +84,7 @@ squares.forEach(square => {
             tile.classList.remove('shadow');
             const currentRow = parseInt(tile.dataset.row);
             const currentCol = parseInt(tile.dataset.col);
+            const currentDirection = getDirection(); // Get the current direction from the indicator module
             const letter = tile.textContent;
             if (letter) addTileToRack(letter); // Add the letter back to the rack
             tile.textContent = "";
@@ -133,7 +97,7 @@ squares.forEach(square => {
             }
             if (nextTile) {
                 nextTile.focus();
-                moveIndicator(nextTile, currentDirection);
+                moveIndicator(nextTile);
             }
         }
     });
@@ -142,11 +106,11 @@ squares.forEach(square => {
     tile.addEventListener('keydown', (e) => {
         const currentRow = parseInt(tile.dataset.row);
         const currentCol = parseInt(tile.dataset.col);
-    
+        const currentDirection = getDirection(); // Get the current direction from the indicator module
         let newRow = currentRow;
         let newCol = currentCol;
         if (e.key === 'ArrowUp') {
-            currentDirection = 'down';
+            setDirection('down'); 
             newRow--;
         }
         else if (e.key === 'ArrowDown') {
@@ -154,12 +118,12 @@ squares.forEach(square => {
                 newRow++;
             }
             else {
-                currentDirection = 'down';
-                moveIndicator(tile, currentDirection);
+                setDirection('down');
+                moveIndicator(tile);
             }
         } 
         else if (e.key === 'ArrowLeft') {
-            currentDirection = 'right';
+            setDirection('right');
             newCol--;
         }
         else if (e.key === 'ArrowRight') {
@@ -167,8 +131,8 @@ squares.forEach(square => {
                 newCol++;
             }
             else {
-                currentDirection = 'right';
-                moveIndicator(tile, currentDirection);
+                setDirection('right');
+                moveIndicator(tile);
             }
         }
         else return;
