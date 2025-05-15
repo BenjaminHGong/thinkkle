@@ -27,7 +27,8 @@ let tileBag = {
     'Z': 1
 };
 
-let rackLetters = drawRack(); // Initial draw of the rack
+let rackLetters = []
+drawRack(); // Initial draw of the rack
 
 export function getRackLetters() {
     return rackLetters;
@@ -39,9 +40,7 @@ export function setRackLetters(letters) {
 
 export function drawRack() {
     const rack = document.querySelector('.rack');
-    rack.innerHTML = ''; // Clear the rack
     const letters = Object.keys(tileBag);
-    const rackLetters = [];
 
     while (rackLetters.length < 7) {
         if (letters.length === 0) break; // Stop if the bag is empty
