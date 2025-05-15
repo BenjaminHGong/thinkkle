@@ -4,11 +4,6 @@
     padding: 0;
 }
 
-.center {
-    margin-left: auto;
-    margin-right: auto;
-}
-
 .title {
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
@@ -142,7 +137,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 2vh auto;
+    margin: 1vh auto;
     width: 50vmin;
     height: 8vmin;
     background-color: bisque;
@@ -152,9 +147,22 @@
     gap: 1vmin;
 }
 
+.square .tile {
+    font-size: 4vmin;
+}
+
 .rack .tile {
     width: 6vmin;
     height: 6vmin;
     font-size: 4.8vmin;
     position: relative;
+}
+
+#submit-button {
+    margin: 1vh auto;
+    display: flex;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 3vmin;
+    background-color: lavender;
+    padding: 1vmin;
 }
