@@ -23,8 +23,6 @@ function checkConnectedTiles(placedTiles, direction) {
     // Main word
     if (direction === 'horizontal') {
         placedTiles.sort((a, b) => a.col - b.col);
-        const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
-        if (mainWord.length > 1) words.push(mainWord);
 
         // Perpendicular words for each placed tile
         placedTiles.forEach(tile => {
@@ -57,8 +55,6 @@ function checkConnectedTiles(placedTiles, direction) {
         }
     } else if (direction === 'vertical') {
         placedTiles.sort((a, b) => a.row - b.row);
-        const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
-        if (mainWord.length > 1) words.push(mainWord);
 
         // Perpendicular words for each placed tile
         placedTiles.forEach(tile => {
@@ -148,7 +144,7 @@ export function validateSubsequentTurn(placedTiles) {
         if (!ret.valid) {
             return ret;
         }
-        const word = formWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
+        const word = getWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
         if (word.length > 1) {
             ret.words.push(word);
         }
@@ -160,7 +156,7 @@ export function validateSubsequentTurn(placedTiles) {
         if (!ret.valid) {
             return ret;
         }
-        const word = formWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
+        const word = getWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
         if (word.length > 1) {
             ret.words.push(word);
         }

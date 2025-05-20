@@ -1,3 +1,5 @@
+import { createTile } from './board.js';
+
 let tileBag = {
     'A': 8, 
     'B': 2, 
@@ -40,31 +42,31 @@ export function setRackLetters(letters) {
 
 export function drawRack() {
     const rack = document.querySelector('.rack');
-    const letters = Object.keys(tileBag);
+    // Only include letters with count > 0
+    let availableLetters = Object.keys(tileBag).filter(l => tileBag[l] > 0);
 
-    while (rackLetters.length < 7) {
-        if (letters.length === 0) break; // Stop if the bag is empty
-
+    while (rackLetters.length < 7 && availableLetters.length > 0) {
         // Pick a random letter
-        const randomIndex = Math.floor(Math.random() * letters.length);
-        const letter = letters[randomIndex];
+        const randomIndex = Math.floor(Math.random() * availableLetters.length);
+        const letter = availableLetters[randomIndex];
 
-        // Add the letter to the rack and decrement its count in the tile bag
-        rackLetters.push(letter);
-        tileBag[letter]--;
-        if (tileBag[letter] === 0) {
-            letters.splice(randomIndex, 1); // Remove letter if count reaches 0
+        // Double-check the count before drawing
+        if (tileBag[letter] > 0) {
+            rackLetters.push(letter);
+            tileBag[letter]--;
+            if (tileBag[letter] === 0) {
+                availableLetters.splice(randomIndex, 1); // Remove letter if count reaches 0
+            }
+            const tile = createTile(letter);
+            rack.appendChild(tile);
+        } else {
+            // Remove letter if count is 0 (shouldn't happen, but safe)
+            availableLetters.splice(randomIndex, 1);
         }
-
-        const tile = document.createElement('div');
-        tile.classList.add('tile');
-        tile.classList.add('shadow'); // Class for rack tiles
-        tile.textContent = letter;
-
-        rack.appendChild(tile);
     }
-
+    console.log(tileBag);
     return rackLetters;
+    
 }
 
 export function addTileToRack(letter) {

@@ -147,15 +147,18 @@
     gap: 1vmin;
 }
 
-.square .tile {
+.square .tile-letter {
     font-size: 4vmin;
 }
 
 .rack .tile {
     width: 6vmin;
     height: 6vmin;
-    font-size: 4.8vmin;
     position: relative;
+}
+
+.rack .tile-letter {
+    font-size: 4.8vmin
 }
 
 #submit-button {
@@ -165,4 +168,19 @@
     font-size: 3vmin;
     background-color: lavender;
     padding: 1vmin;
+}
+
+.tile-score {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 0.7em;
+    color: #333;
+    pointer-events: none;
+    user-select: none;
+    z-index: 100;
+}
+
+.square.empty .tile-score {
+    display: none; /* Hide score on empty squares */
 }

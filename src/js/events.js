@@ -1,12 +1,13 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
 import { getRackLetters, setRackLetters, addTileToRack, drawRack } from "./rack.js"; // Import rack functions
-import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
+import { rowLength, columnLength, tileValues } from './constants.js'; // Import constants for board dimensions
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordcheck.js";
 const squares = document.querySelectorAll(".square"); //Array of all cells in the board
 
 squares.forEach(square => {
     const tile = square.querySelector('.tile');
     tile.contentEditable = true; // Make the tile editable
+    
 
     tile.addEventListener('beforeinput', (e) => {
         // Allow deletions, line breaks, etc.
@@ -38,7 +39,10 @@ squares.forEach(square => {
     
     tile.addEventListener("input", () => {
         if (square.classList.contains('empty')) {
-            tile.textContent = tile.textContent.slice(0, 1).toUpperCase();
+            const letter = tile.querySelector('.tile-letter');
+            letter.textContent 
+            const score = tile.querySelector('.tile-score');
+            score.textContent = 3; // Set the score based on the letter
             square.classList.remove('empty'); // Remove empty class when a letter is added
             square.classList.add('filled'); // Add filled class when a letter is added
             tile.dataset.newlyPlaced = "true"; // Mark the tile as newly placed
@@ -179,7 +183,6 @@ submitButton.addEventListener("click", () => {
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
-            let rackLetters = getRackLetters();
             drawRack(); // Draw a new rack after the first turn
         } else {
             alert(validationResult.message); // Show error message to the user
@@ -193,8 +196,6 @@ submitButton.addEventListener("click", () => {
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
-            let rackLetters = getRackLetters();
-
             drawRack(); // Draw a new rack after the turn
         } else {
             alert(validationResult.message); // Show error message to the user

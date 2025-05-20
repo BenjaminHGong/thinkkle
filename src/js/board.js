@@ -1,5 +1,5 @@
 
-import { rowLength, columnLength, specialSquares } from './constants.js';
+import { rowLength, columnLength, specialSquares, tileValues} from './constants.js';
 
 const board = document.querySelector('.board');
 
@@ -34,15 +34,30 @@ function setupBoard() {
             else {
                 square.classList.add('normal'); // Add a class for normal squares
             }
-    
-            const tile = document.createElement('div');
-            tile.classList.add('tile'); // Class for the tile
+            
+            const tile = createTile();
             tile.dataset.row = row;
             tile.dataset.col = col;
             square.appendChild(tile);
             board.appendChild(square);
         }
     }
+}
+
+export function createTile(letter="") {
+    const tile = document.createElement('div');
+    tile.classList.add('tile'); // Class for the tile
+    
+    const letterSpan = document.createElement('span');
+    letterSpan.textContent = letter;
+    letterSpan.classList.add('tile-letter'); // Class for the letter
+    tile.appendChild(letterSpan);
+
+    const scoreSpan = document.createElement('span');
+    scoreSpan.textContent = tileValues[letterSpan.textContent] || 0;
+    scoreSpan.classList.add('tile-score'); // Class for the score
+    tile.appendChild(scoreSpan);
+    return tile;
 }
 
 setupBoard();
