@@ -19,6 +19,10 @@ export class Tile {
 
         this.element.dataset.row = row;
         this.element.dataset.col = col;
+
+        if (letter === "Q" || letter === "X") {
+            this.letterSpan.style.paddingRight = "0.2em";
+        }
     }
 
     getLetter() {
@@ -29,6 +33,9 @@ export class Tile {
         this.letter = letter;
         this.letterSpan.textContent = letter;
         this.scoreSpan.textContent = tileValues[letter] || 0; // Update score based on the new letter
+        if (letter === "Q" || letter === "X") {
+            this.letterSpan.style.marginRight = "0.2em";
+        }
         this.getSquare().classList.remove('empty'); 
         this.getSquare().classList.add('filled'); // Add filled class
     }
