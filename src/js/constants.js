@@ -73,3 +73,31 @@ export const specialSquares = [
     { row: 13, col: 5, type: 'triple-letter' },
     { row: 13, col: 9, type: 'triple-letter' }
 ];
+export const tileValues = {
+    'A': 1, 
+    'B': 4, 
+    'C': 2, 
+    'D': 2, 
+    'E': 1,
+    'F': 6,
+    'G': 2,
+    'H': 4,
+    'I': 1,
+    'J': 10,
+    'K': 6,
+    'L': 1,
+    'M': 2,
+    'N': 1,
+    'O': 1,
+    'P': 2,
+    'Q': 10,
+    'R': 1,
+    'S': 1,
+    'T': 1,
+    'U': 2,
+    'V': 6,
+    'W': 6,
+    'X': 10,
+    'Y': 4,
+    'Z': 8
+}

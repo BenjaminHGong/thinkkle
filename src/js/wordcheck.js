@@ -31,13 +31,7 @@ function checkConnectedTiles(placedTiles, direction) {
             // Find the start of the perpendicular word
             let startRow = tile.row;
             let startCol = tile.col;
-            while (
-                startRow - 1 >= 0 &&
-                document.querySelector(`.tile[data-row='${startRow - 1}'][data-col='${startCol}']`)?.textContent
-            ) {
-                startRow--;
-            }
-            const perpWord = formWord(startRow, startCol, 1, 0);
+            const perpWord = getWord(startRow, startCol, 1, 0);
             if (
                 perpWord.length > 1 &&
                 !words.includes(perpWord)
@@ -127,11 +121,10 @@ export function validateFirstTurn(placedTiles) {
     if (!centerTile) {
         return { valid: false, message: "One tile must be on the center square." };
     }
-
     if (!dictionary.has(word)) {
         return { valid: false, message: "The word is not in the dictionary." };
     }
-
+    
     return { valid: true, message: "Valid first turn." };
 }
 
@@ -148,21 +141,12 @@ export function validateSubsequentTurn(placedTiles) {
         if (!ret.valid) {
             return ret;
         }
-        const word = formWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
-        if (word.length > 1) {
-            ret.words.push(word);
-        }
     }
-        
     else if (allinSameCol) {
         placedTiles.sort((a, b) => a.row - b.row);
         ret = checkConnectedTiles(placedTiles, 'vertical');
         if (!ret.valid) {
             return ret;
-        }
-        const word = formWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
-        if (word.length > 1) {
-            ret.words.push(word);
         }
     }
     else {
@@ -178,7 +162,8 @@ export function validateSubsequentTurn(placedTiles) {
         ];
         return adjacentTiles.some(adjTile => {
             const existingTile = document.querySelector(`.tile[data-row='${adjTile.row}'][data-col='${adjTile.col}']`);
-            return existingTile && existingTile.textContent !== "" && existingTile.dataset.newlyPlaced !== "true";
+            const existingLetterSpan = existingTile.querySelector('.tile-letter');
+            return existingTile && existingLetterSpan.textContent !== "" && existingTile.dataset.newlyPlaced !== "true";
         });
     });
 
@@ -186,6 +171,7 @@ export function validateSubsequentTurn(placedTiles) {
         return { valid: false, message: "At least one tile must connect to an existing tile." };
     }
     for (const word of ret.words) {
+        console.log(word);
         if (!dictionary.has(word)) {
             return { valid: false, message: "The word is not in the dictionary." };
         }
@@ -203,10 +189,12 @@ function getWord(row, col, dy, dx) {
         currentCol - dx < columnLength
     ) {
         const prevTile = document.querySelector(`.tile[data-row='${currentRow - dy}'][data-col='${currentCol - dx}']`);
-        if (!prevTile || prevTile.textContent === "") break;
+        const prevLetterSpan = prevTile.querySelector('.tile-letter');
+        if (!prevTile || prevLetterSpan.textContent === "") break;
         currentRow -= dy;
         currentCol -= dx;
     }
+    
     return formWord(currentRow, currentCol, dy, dx);
 }
 
@@ -217,8 +205,9 @@ function formWord(row, col, dy, dx) {
 
     while (currentRow >= 0 && currentCol >= 0 && currentRow < rowLength && currentCol < columnLength) {
         const tile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol}']`);
-        if (tile && tile.textContent !== "") {
-            word += tile.textContent;
+        const letterSpan = tile.querySelector('.tile-letter');
+        if (tile && letterSpan.textContent !== "") {
+            word += letterSpan.textContent;
         } else {
             break;
         }

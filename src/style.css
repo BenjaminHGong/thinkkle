@@ -42,9 +42,6 @@
 }
 
 .tile {
-    -webkit-user-select: auto;
-    user-select: none; /* Prevent text selection */
-    -webkit-user-drag: none;
     position: absolute;
     z-index: 1;
     border-radius: 20%; /* Circular tile */
@@ -52,6 +49,17 @@
     bottom: 5%;
 }
 
+.square .tile {
+    font-size: 4vmin;
+}
+.tile-letter {
+    user-select: none;
+    min-width: 1em;
+    min-height: 1em;
+}
+.tile-letter:focus {
+    outline: none;
+}
 .tile.shadow {
     box-shadow: 0 0.1em rgb(141, 114, 33);
 }
@@ -60,7 +68,29 @@
     background-color: transparent; /* Transparent for empty tiles */
     outline: none;
 }
+.square.empty .tile.shadow {
+    box-shadow: none; /* No shadow for empty tiles */
+}
 
+.tile-score {
+    font-size: 0.3em;
+    position: absolute;
+    bottom: 5%;
+    right: 5%;
+    color: #333;
+    pointer-events: none;
+    user-select: none;
+}
+
+.square .tile-letter {
+    font-size: 4vmin;
+}
+
+
+
+.square.empty .tile-score {
+    display: none; /* Hide score on empty squares */
+}
 
 /* Add tile hover and focus effect */
 .square.empty:hover {
@@ -78,11 +108,12 @@
     z-index: 2;
 }
 
-.square.filled .tile:focus {
+.square.filled .tile:focus-within {
     outline: 3px solid dodgerblue;
     outline-offset: -2px;
     z-index: 2;
 }
+
 
 .normal {
     background-color: bisque;
@@ -133,6 +164,7 @@
     transform: translate(-50%, 10%);
 }
 
+
 .rack {
     display: flex;
     justify-content: center;
@@ -147,9 +179,6 @@
     gap: 1vmin;
 }
 
-.square .tile {
-    font-size: 4vmin;
-}
 
 .rack .tile {
     width: 6vmin;
@@ -157,6 +186,8 @@
     font-size: 4.8vmin;
     position: relative;
 }
+
+
 
 #submit-button {
     margin: 1vh auto;
@@ -166,3 +197,6 @@
     background-color: lavender;
     padding: 1vmin;
 }
+
+
+

@@ -1,5 +1,6 @@
 
-import { rowLength, columnLength, specialSquares } from './constants.js';
+import { rowLength, columnLength, specialSquares} from './constants.js';
+import { Tile } from './tile.js';
 
 const board = document.querySelector('.board');
 
@@ -34,15 +35,14 @@ function setupBoard() {
             else {
                 square.classList.add('normal'); // Add a class for normal squares
             }
-    
-            const tile = document.createElement('div');
-            tile.classList.add('tile'); // Class for the tile
-            tile.dataset.row = row;
-            tile.dataset.col = col;
-            square.appendChild(tile);
+            
+            const tile = new Tile("", row, col);
+            square.appendChild(tile.element);
+            square.tileInstance = tile;
             board.appendChild(square);
         }
     }
 }
+
 
 setupBoard();

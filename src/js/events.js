@@ -6,23 +6,21 @@ const squares = document.querySelectorAll(".square"); //Array of all cells in th
 
 squares.forEach(square => {
     const tile = square.querySelector('.tile');
-    tile.contentEditable = true; // Make the tile editable
+    const tileInstance = square.tileInstance;
+    const letterSpan = tile.querySelector('.tile-letter');
+    letterSpan.contentEditable = true; // Make the letter editable
 
-    tile.addEventListener('beforeinput', (e) => {
-        // Allow deletions, line breaks, etc.
+    letterSpan.addEventListener('beforeinput', (e) => {
+        // Allow deletions
         if (e.inputType.startsWith("delete")) return;
 
         // If input is a single alphabetical character, allow it
         const text = e.data?.toUpperCase();
-        const letter = tile.textContent;
+        const letter = letterSpan.textContent;
         let rackLetters = getRackLetters(); // Get the current letters in the rack
-        if (!rackLetters.includes(text)) {
+        if ((!/^[A-Z]$/.test(text) || !rackLetters.includes(text)) && square.classList.contains('empty')) {
             e.preventDefault(); // Block input
-        } else {
-            if (square.classList.contains('filled') && tile.dataset.newlyPlaced === "false") {
-                e.preventDefault(); // Block input if the tile is already filled and not newly placed
-                return;
-            }
+        } else if (square.classList.contains('empty') || tile.dataset.newlyPlaced === "true") {
             const index = rackLetters.indexOf(text);
             if (index !== -1) {
                 rackLetters.splice(index, 1); // Remove from rackLetters
@@ -30,24 +28,31 @@ squares.forEach(square => {
                 if (rackTile) rackTile.remove(); // Remove from the rack display
                 if (letter) addTileToRack(letter); // Add the letter back to the rack if it was already there
             }
+            letterSpan.textContent = ""; // Clear the cell before setting the new value
             
-            tile.textContent = ""; // Clear the cell before setting the new value
         }
         setRackLetters(rackLetters); // Update the rack letters in the module
     });
     
-    tile.addEventListener("input", () => {
-        if (square.classList.contains('empty')) {
-            tile.textContent = tile.textContent.slice(0, 1).toUpperCase();
-            square.classList.remove('empty'); // Remove empty class when a letter is added
-            square.classList.add('filled'); // Add filled class when a letter is added
-            tile.dataset.newlyPlaced = "true"; // Mark the tile as newly placed
-            tile.classList.add('shadow');
-        }
-        else if (tile.dataset.newlyPlaced === "true") {
-            tile.textContent = tile.textContent.slice(0, 1).toUpperCase();
-        }
+    letterSpan.addEventListener("input", (e) => {
+        if (square.classList.contains('filled') && tile.dataset.newlyPlaced === "false") {
+            if (letterSpan.textContent !== tileInstance.getLetter()) {
+                letterSpan.textContent = tileInstance.getLetter();
+            }
+        } 
+        else {
+            let inputLetter = letterSpan.textContent.slice(0, 1).toUpperCase();
+            if (square.classList.contains('empty')) {
+                tileInstance.setLetter(inputLetter); // Set the letter in the tile
+                tile.dataset.newlyPlaced = "true"; // Mark the tile as newly placed
 
+            }
+            else if (tile.dataset.newlyPlaced === "true") {
+                tileInstance.setLetter(inputLetter); // Set the letter in the tile
+            }
+        }
+        
+        console.log("RUNNING");
         const currentRow = parseInt(tile.dataset.row);
         const currentCol = parseInt(tile.dataset.col);
 
@@ -61,36 +66,33 @@ squares.forEach(square => {
         }                
 
         if (nextTile) {
-            nextTile.focus();
+            const nextLetterSpan = nextTile.querySelector('.tile-letter');
+            nextLetterSpan.focus();
             moveIndicator(nextTile);
         }
     });
 
-    tile.addEventListener('focus', () => {
+    letterSpan.addEventListener('focus', () => {
         moveIndicator(tile);
     });
 
     // Prevent dragging and dropping text into the tile
-    tile.addEventListener('dragstart', (e) => {
+    letterSpan.addEventListener('dragstart', (e) => {
         e.preventDefault();
     });
 
     // Prevent pasting
-    tile.addEventListener('paste', (e) => {
+    letterSpan.addEventListener('paste', (e) => {
         e.preventDefault();
     });
 
     // Delete cell content on Backspace or Delete key press
-    tile.addEventListener("keydown", (e) => {
+    letterSpan.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
             if (tile.dataset.newlyPlaced !== "false") {
-                square.classList.add('empty'); // Add empty class back when cleared
-                square.classList.remove('filled'); // Remove filled class when cleared
-                tile.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
-                tile.classList.remove('shadow');
-                const letter = tile.textContent;
+                const letter = letterSpan.textContent;
                 if (letter) addTileToRack(letter); // Add the letter back to the rack
-                tile.textContent = "";
+                tileInstance.clear(); // Clear the tile
             }
             e.preventDefault(); 
             const currentRow = parseInt(tile.dataset.row);
@@ -104,14 +106,15 @@ squares.forEach(square => {
                 nextTile = document.querySelector(`.tile[data-row='${currentRow - 1}'][data-col='${currentCol}']`);
             }
             if (nextTile) {
-                nextTile.focus();
+                const nextLetterSpan = nextTile.querySelector('.tile-letter');
+                nextLetterSpan.focus();
                 moveIndicator(nextTile);
             }
         }
     });
 
       // Handle navigation with arrow keys
-    tile.addEventListener('keydown', (e) => {
+    letterSpan.addEventListener('keydown', (e) => {
         const currentRow = parseInt(tile.dataset.row);
         const currentCol = parseInt(tile.dataset.col);
         const currentDirection = getDirection(); // Get the current direction from the indicator module
@@ -151,10 +154,20 @@ squares.forEach(square => {
         if (newRow < 0 || newRow >= rowLength || newCol < 0 || newCol >= columnLength) return;
     
         const nextTile = document.querySelector(`.tile[data-row='${newRow}'][data-col='${newCol}']`);
-        if (nextTile) nextTile.focus();
+        if (nextTile) {
+            const nextLetterSpan = nextTile.querySelector('.tile-letter');
+            nextLetterSpan.focus();
+        }
     });
 
-    tile.addEventListener('blur', () => {
+    letterSpan.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            submitButton.click(); // Trigger the submit button click event
+            e.preventDefault(); // Prevent the default action of the Enter key
+        }
+    });
+
+    letterSpan.addEventListener('blur', () => {
         hideIndicator(); // Hide the indicator when the tile loses focus
     });
 });
@@ -166,7 +179,8 @@ submitButton.addEventListener("click", () => {
     document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tile => {
         const row = parseInt(tile.dataset.row);
         const col = parseInt(tile.dataset.col);
-        placedTiles.push({row, col, letter: tile.textContent, element: tile});
+        const letterSpan = tile.querySelector('.tile-letter');
+        placedTiles.push({row, col, letter: letterSpan.textContent, element: tile});
     });
 
     let validationResult;
@@ -179,7 +193,6 @@ submitButton.addEventListener("click", () => {
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
-            let rackLetters = getRackLetters();
             drawRack(); // Draw a new rack after the first turn
         } else {
             alert(validationResult.message); // Show error message to the user
@@ -193,12 +206,9 @@ submitButton.addEventListener("click", () => {
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
-            let rackLetters = getRackLetters();
-
             drawRack(); // Draw a new rack after the turn
         } else {
             alert(validationResult.message); // Show error message to the user
         }
     }
 });
-
