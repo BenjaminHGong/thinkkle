@@ -17,74 +17,61 @@ export function setFirstTurn(value) {
     firstTurn = value;
 }
 
+function addPerpendicularWords(words, placedTiles, dy, dx) {
+    placedTiles.forEach(tile => {
+        let startRow = tile.row;
+        let startCol = tile.col;
+        // Find the start of the perpendicular word
+        while (
+            startRow - dy >= 0 &&
+            startCol - dx >= 0 &&
+            document.querySelector(`.tile[data-row='${startRow - dy}'][data-col='${startCol - dx}']`)?.querySelector('.tile-letter')?.textContent
+        ) {
+            startRow -= dy;
+            startCol -= dx;
+        }
+        const perpWord = formWord(startRow, startCol, dy, dx);
+        if (perpWord.length > 1 && !words.includes(perpWord)) {
+            words.push(perpWord);
+        }
+    });
+}
+
+function areTilesConnected(placedTiles, axis) {
+    const indices = placedTiles.map(tile => tile[axis]).sort((a, b) => a - b);
+    const fixed = axis === 'col' ? placedTiles[0].row : placedTiles[0].col;
+    for (let i = indices[0]; i <= indices[indices.length - 1]; i++) {
+        const isPlaced = placedTiles.some(tile => tile[axis] === i);
+        const selector = axis === 'col'
+            ? `.tile[data-row='${fixed}'][data-col='${i}']`
+            : `.tile[data-row='${i}'][data-col='${fixed}']`;
+        const tile = document.querySelector(selector);
+        if (!isPlaced && (!tile || !tile.querySelector('.tile-letter')?.textContent)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function checkConnectedTiles(placedTiles, direction) {
     let words = [];
-
-    // Main word
     if (direction === 'horizontal') {
         placedTiles.sort((a, b) => a.col - b.col);
         const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
         if (mainWord.length > 1) words.push(mainWord);
-
-        // Perpendicular words for each placed tile
-        placedTiles.forEach(tile => {
-            // Find the start of the perpendicular word
-            let startRow = tile.row;
-            let startCol = tile.col;
-            const perpWord = getWord(startRow, startCol, 1, 0);
-            if (
-                perpWord.length > 1 &&
-                !words.includes(perpWord)
-            ) {
-                words.push(perpWord);
-            }
-        });
-        // Check for connectivity
-        const cols = placedTiles.map(tile => tile.col).sort((a, b) => a - b);
-        for (let i = cols[0]; i <= cols[cols.length - 1]; i++) {
-            if (
-                !placedTiles.some(tile => tile.col === i) &&
-                !document.querySelector(`.tile[data-row='${placedTiles[0].row}'][data-col='${i}']`)?.textContent
-            ) {
-                return { valid: false, message: "All tiles should be placed next to each other." };
-            }
+        addPerpendicularWords(words, placedTiles, 1, 0);
+        if (!areTilesConnected(placedTiles, 'col')) {
+            return { valid: false, message: "All tiles should be placed next to each other." };
         }
     } else if (direction === 'vertical') {
         placedTiles.sort((a, b) => a.row - b.row);
         const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
         if (mainWord.length > 1) words.push(mainWord);
-
-        // Perpendicular words for each placed tile
-        placedTiles.forEach(tile => {
-            // Find the start of the perpendicular word
-            let startRow = tile.row;
-            let startCol = tile.col;
-            while (
-                startCol - 1 >= 0 &&
-                document.querySelector(`.tile[data-row='${startRow}'][data-col='${startCol - 1}']`)?.textContent
-            ) {
-                startCol--;
-            }
-            const perpWord = formWord(startRow, startCol, 0, 1);
-            if (
-                perpWord.length > 1 &&
-                !words.includes(perpWord)
-            ) {
-                words.push(perpWord);
-            }
-        });
-        // Check for connectivity
-        const rows = placedTiles.map(tile => tile.row).sort((a, b) => a - b);
-        for (let i = rows[0]; i <= rows[rows.length - 1]; i++) {
-            if (
-                !placedTiles.some(tile => tile.row === i) &&
-                !document.querySelector(`.tile[data-row='${i}'][data-col='${placedTiles[0].col}']`)?.textContent
-            ) {
-                return { valid: false, message: "All tiles should be placed next to each other." };
-            }
+        addPerpendicularWords(words, placedTiles, 0, 1);
+        if (!areTilesConnected(placedTiles, 'row')) {
+            return { valid: false, message: "All tiles should be placed next to each other." };
         }
     }
-
     return { valid: true, message: "Tiles are connected.", words: words };
 }
 
@@ -152,7 +139,6 @@ export function validateSubsequentTurn(placedTiles) {
     else {
         return { valid: false, message: "All tiles must be in the same row or column." };
     }
-    console.log(ret.words);
     const connectsToExistingTile = placedTiles.some(tile => {
         const adjacentTiles = [
             { row: tile.row - 1, col: tile.col },
@@ -171,7 +157,7 @@ export function validateSubsequentTurn(placedTiles) {
         return { valid: false, message: "At least one tile must connect to an existing tile." };
     }
     for (const word of ret.words) {
-        console.log(word);
+
         if (!dictionary.has(word)) {
             return { valid: false, message: "The word is not in the dictionary." };
         }
