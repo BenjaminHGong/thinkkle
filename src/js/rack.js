@@ -66,7 +66,6 @@ export function drawRack() {
             availableLetters.splice(randomIndex, 1);
         }
     }
-    console.log(tileBag);
     return rackLetters;
 }
 
