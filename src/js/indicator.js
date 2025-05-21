@@ -44,7 +44,7 @@ export function hideIndicator() {
 
 window.addEventListener('resize', () => {
     const focused = document.activeElement;
-    if (focused?.classList.contains('tile')) {
+    if (focused?.classList.contains('tile-letter')) {
         moveIndicator(focused);
     }
 });
