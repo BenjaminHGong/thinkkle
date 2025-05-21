@@ -52,7 +52,6 @@ squares.forEach(square => {
             }
         }
         
-        console.log("RUNNING");
         const currentRow = parseInt(tile.dataset.row);
         const currentCol = parseInt(tile.dataset.col);
 
