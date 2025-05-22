@@ -158,7 +158,7 @@ export function calculateWordScore(wordTiles) {
         }
 
         // Check for word bonuses
-        if (square.classList.contains('double-word')) {
+        if (square.classList.contains('double-word') || square.classList.contains('star')) {
             wordMultiplier *= 2;
         } else if (square.classList.contains('triple-word')) {
             wordMultiplier *= 3;
@@ -189,8 +189,9 @@ export function validateFirstTurn(placedTiles) {
     if (!dictionary.has(word)) {
         return { valid: false, message: "The word is not in the dictionary." };
     }
+    const wordScore = calculateWordScore(ret.words[0]);
 
-    return { valid: true, message: "Valid first turn." };
+    return { valid: true, message: "Valid first turn.", score: wordScore };
 }
 
 export function validateSubsequentTurn(placedTiles) {
@@ -220,14 +221,16 @@ export function validateSubsequentTurn(placedTiles) {
         return ret;
     }
 
+    let totalWordScore = 0;
     for (const wordTiles of ret.words) {
         const word = wordTiles.map(tile => tile.letter).join('');
         if (!dictionary.has(word)) {
             return { valid: false, message: "The word is not in the dictionary." };
         }
+        totalWordScore += calculateWordScore(wordTiles);
     }
 
-    return { valid: true, message: "Valid subsequent turn." };
+    return { valid: true, message: "Valid subsequent turn.", score: totalWordScore};
 }
 
 

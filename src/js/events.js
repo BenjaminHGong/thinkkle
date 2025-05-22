@@ -14,6 +14,9 @@ squares.forEach(square => {
         // Allow deletions
         if (e.inputType.startsWith("delete")) return;
 
+        //Allow movement to the next tile on top of already placed tiles
+        if (!isFirstTurn() && tile.dataset.newlyPlaced === "false") return;
+
         // If input is a single alphabetical character, allow it
         const text = e.data?.toUpperCase();
         const letter = letterSpan.textContent;
@@ -188,7 +191,7 @@ submitButton.addEventListener("click", () => {
         if (validationResult.valid) {
             setFirstTurn(false); // Set first turn to false after validation
             // Proceed with the game logic for the first turn
-            console.log("First turn is valid:", validationResult.message);
+            console.log(`First turn is valid: ${validationResult.message} Score: ${validationResult.score}`);
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
@@ -201,7 +204,7 @@ submitButton.addEventListener("click", () => {
         validationResult = validateSubsequentTurn(placedTiles);
         if (validationResult.valid) {
             // Proceed with the game logic for subsequent turns
-            console.log("Subsequent turn is valid:", validationResult.message);
+            console.log(`Subsequent turn is valid: ${validationResult.message} Score: ${validationResult.score}`);
             placedTiles.forEach(tile => {
                 tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
             });
