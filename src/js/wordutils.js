@@ -1,4 +1,4 @@
-import { rowLength, columnLength } from './constants.js';
+import { rowLength, columnLength, tileValues } from './constants.js';
 
 const dictionary = new Set();
 fetch('wordlist.txt')
@@ -139,6 +139,36 @@ function checkWord(placedTiles) {
     }
     return { valid: true, message: "Words formed successfully.", words: ret.words };
 }
+
+export function calculateWordScore(wordTiles) {
+    // wordTiles: array of {row, col, letter, element}
+    let score = 0;
+    let wordMultiplier = 1;
+
+    wordTiles.forEach(tile => {
+        let letterScore = tileValues[tile.letter.toUpperCase()] || 0;
+        const square = tile.element.closest('.square');
+        let letterMultiplier = 1;
+
+        // Check for letter bonuses
+        if (square.classList.contains('double-letter')) {
+            letterMultiplier = 2;
+        } else if (square.classList.contains('triple-letter')) {
+            letterMultiplier = 3;
+        }
+
+        // Check for word bonuses
+        if (square.classList.contains('double-word')) {
+            wordMultiplier *= 2;
+        } else if (square.classList.contains('triple-word')) {
+            wordMultiplier *= 3;
+        }
+
+        score += letterScore * letterMultiplier;
+    });
+
+    return score * wordMultiplier;
+}
     
 export function validateFirstTurn(placedTiles) {
     if (placedTiles.length < 2) {
@@ -199,9 +229,5 @@ export function validateSubsequentTurn(placedTiles) {
 
     return { valid: true, message: "Valid subsequent turn." };
 }
-
-
-
-
 
 

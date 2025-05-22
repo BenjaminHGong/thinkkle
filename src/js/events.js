@@ -1,7 +1,7 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
 import { getRackLetters, setRackLetters, addTileToRack, drawRack } from "./rack.js"; // Import rack functions
 import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
-import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordcheck.js";
+import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
 const squares = document.querySelectorAll(".square"); //Array of all cells in the board
 
 squares.forEach(square => {
