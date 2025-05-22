@@ -43,14 +43,12 @@ export function setRackLetters(letters) {
 
 export function drawRack() {
     const rack = document.querySelector('.rack');
-    const letters = Object.keys(tileBag);
-
     while (rackLetters.length < 7) {
-        if (letters.length === 0) break; // Stop if the bag is empty
+        if (availableLetters.length === 0) break; // Stop if the bag is empty
 
         // Pick a random letter
-        const randomIndex = Math.floor(Math.random() * letters.length);
-        const letter = letters[randomIndex];
+        const randomIndex = Math.floor(Math.random() * availableLetters.length);
+        const letter = availableLetters[randomIndex];
 
         // Double-check the count before drawing
         if (tileBag[letter] > 0) {
