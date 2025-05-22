@@ -80,6 +80,22 @@ function addPerpendicularWords(words, placedTiles, dy, dx) {
     });
 }
 
+function areTilesConnected(placedTiles, axis) {
+    const indices = placedTiles.map(tile => tile[axis]).sort((a, b) => a - b);
+    const fixed = axis === 'col' ? placedTiles[0].row : placedTiles[0].col;
+    for (let i = indices[0]; i <= indices[indices.length - 1]; i++) {
+        const isPlaced = placedTiles.some(tile => tile[axis] === i);
+        const selector = axis === 'col'
+            ? `.tile[data-row='${fixed}'][data-col='${i}']`
+            : `.tile[data-row='${i}'][data-col='${fixed}']`;
+        const tile = document.querySelector(selector);
+        if (!isPlaced && (!tile || !tile.querySelector('.tile-letter')?.textContent)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 function checkConnectedTiles(placedTiles, direction) {
     let words = [];
     if (direction === 'horizontal') {
@@ -87,31 +103,41 @@ function checkConnectedTiles(placedTiles, direction) {
         const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 0, 1);
         if (mainWord.length > 1) words.push(mainWord);
         addPerpendicularWords(words, placedTiles, 1, 0);
+        if (!areTilesConnected(placedTiles, 'col')) {
+            return { valid: false, message: "All tiles should be placed next to each other." };
+        }
     } else if (direction === 'vertical') {
         placedTiles.sort((a, b) => a.row - b.row);
         const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
         if (mainWord.length > 1) words.push(mainWord);
         addPerpendicularWords(words, placedTiles, 0, 1);
+        if (!areTilesConnected(placedTiles, 'row')) {
+            return { valid: false, message: "All tiles should be placed next to each other." };
+        }
     }
-    return words;
+    return { valid: true, message: "Tiles are connected.", words: words };
 }
 
 function checkWord(placedTiles) {
     const allinSameRow = placedTiles.every(tile => tile.row === placedTiles[0].row);
     const allinSameCol = placedTiles.every(tile => tile.col === placedTiles[0].col);
-    let words = [];
+    let ret = "";
     if (allinSameRow) {
         placedTiles.sort((a, b) => a.col - b.col);
-        words = checkConnectedTiles(placedTiles, 'horizontal'); 
+        ret = checkConnectedTiles(placedTiles, 'horizontal'); 
     }    
     else if (allinSameCol) {
         placedTiles.sort((a, b) => a.row - b.row);
-        words = checkConnectedTiles(placedTiles, 'vertical');
+        ret = checkConnectedTiles(placedTiles, 'vertical');
     } 
     else {
         return { valid: false, message: "All tiles must be in the same row or column." };
     }
-    return { valid: true, message: "Words formed successfully.", words: words };
+    
+    if (!ret.valid) {
+        return ret;
+    }
+    return { valid: true, message: "Words formed successfully.", words: ret.words };
 }
     
 export function validateFirstTurn(placedTiles) {
