@@ -1,5 +1,5 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
-import { getRackLetters, setRackLetters, addTileToRack, drawRack } from "./rack.js"; // Import rack functions
+import { getRackLetters, setRackLetters, addTileToRack, drawRack, addTileToBag } from "./rack.js"; // Import rack functions
 import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
 const squares = document.querySelectorAll(".square"); //Array of all cells in the board
@@ -174,7 +174,24 @@ squares.forEach(square => {
     });
 });
 
-const submitButton = document.querySelector("#submit-button");
+const submitButton = document.getElementById("submit-button");
+const errorMessage = document.getElementById("error-message");
+const turn = document.getElementById("turn");
+
+function showError(msg) {
+    errorMessage.textContent = msg;
+    errorMessage.classList.remove('fading-out');
+    errorMessage.classList.add('fading-in');
+    setTimeout(() => {
+        errorMessage.classList.remove('fading-in');
+        errorMessage.classList.add('fading-out');
+        setTimeout(() => {
+            errorMessage.textContent = "";
+            errorMessage.classList.remove('fading-out');
+            errorMessage.style.color = "red";
+        }, 400);
+    }, 1600);
+}
 
 submitButton.addEventListener("click", () => {
     let placedTiles = []
@@ -189,28 +206,61 @@ submitButton.addEventListener("click", () => {
     if (isFirstTurn()) {
         validationResult = validateFirstTurn(placedTiles);
         if (validationResult.valid) {
-            setFirstTurn(false); // Set first turn to false after validation
-            // Proceed with the game logic for the first turn
-            console.log(`First turn is valid: ${validationResult.message} Score: ${validationResult.score}`);
-            placedTiles.forEach(tile => {
-                tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
-            });
-            drawRack(); // Draw a new rack after the first turn
+            setFirstTurn(false);
         } else {
-            alert(validationResult.message); // Show error message to the user
+            showError(validationResult.message); // Show error message to the user
+            return;
         }
     }
     else {
         validationResult = validateSubsequentTurn(placedTiles);
-        if (validationResult.valid) {
-            // Proceed with the game logic for subsequent turns
-            console.log(`Subsequent turn is valid: ${validationResult.message} Score: ${validationResult.score}`);
-            placedTiles.forEach(tile => {
-                tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
-            });
-            drawRack(); // Draw a new rack after the turn
-        } else {
-            alert(validationResult.message); // Show error message to the user
+        if (!validationResult.valid) {
+            showError(validationResult.message); // Show error message to the user
+            return;
         }
     }
+    placedTiles.forEach(tile => {
+        tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
+        tile.element.classList.add('played');
+        setTimeout(() => tile.element.classList.remove('played'), 500);
+        tile.element.dataset.newlyPlaced = "false";
+    });
+
+    drawRack(); // Draw a new rack after the first turn
+    turn.textContent = `${parseInt(turn.textContent) + 1}` 
+
+    const score = validationResult.score; // Update the score
+    const scoreSpan = document.getElementById("score");
+    scoreSpan.textContent = `${parseInt(scoreSpan.textContent) + score}`; // Update the score display 
+
+    errorMessage.style.color = "green"; // Green for success
+    showError(`${validationResult.message} (+${score} Points)`);
+    
+
+});
+
+document.getElementById('redraw-button').addEventListener('click', () => {
+    const rack = document.querySelector('.rack');
+    const selectedTiles = Array.from(rack.querySelectorAll('.tile.selected-for-redraw'));
+    if (selectedTiles.length === 0) return;
+
+    let rackLetters = getRackLetters();
+
+    selectedTiles.forEach(tile => {
+        const letterSpan = tile.querySelector('.tile-letter');
+        const letter = letterSpan.textContent[0]; // Assumes letter is first character
+        // Remove from rackLetters
+        const idx = rackLetters.indexOf(letter);
+        if (idx !== -1) rackLetters.splice(idx, 1);
+        // Remove from DOM
+        tile.classList.add('fading-out');
+        setTimeout(() => {
+            tile.remove();
+            addTileToBag(letter);
+            setRackLetters(rackLetters);
+            drawRack();
+        }, 400);
+    });
+
+    turn.textContent = `${parseInt(turn.textContent) + 1}` 
 });
