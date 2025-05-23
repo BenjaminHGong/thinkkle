@@ -89,7 +89,7 @@ function areTilesConnected(placedTiles, axis) {
             ? `.tile[data-row='${fixed}'][data-col='${i}']`
             : `.tile[data-row='${i}'][data-col='${fixed}']`;
         const tile = document.querySelector(selector);
-        if (!isPlaced && (!tile || !tile.querySelector('.tile-letter')?.textContent)) {
+        if (!isPlaced && (!tile?.querySelector('.tile-letter')?.textContent)) {
             return false;
         }
     }
@@ -131,11 +131,11 @@ function checkWord(placedTiles) {
         ret = checkConnectedTiles(placedTiles, 'vertical');
     } 
     else {
-        return { valid: false, message: "All tiles must be in the same row or column." };
+        return { valid: false, message: "All tiles must be in the same row or column.", words: [] };
     }
     
     if (!ret.valid) {
-        return ret;
+        return { valid: false, message: ret.message, words: [] };
     }
     return { valid: true, message: "Words formed successfully.", words: ret.words };
 }
@@ -172,22 +172,22 @@ export function calculateWordScore(wordTiles) {
     
 export function validateFirstTurn(placedTiles) {
     if (placedTiles.length < 2) {
-        return { valid: false, message: "You must place at least two tiles on your first turn." };
+        return { valid: false, message: "You must place at least two tiles on your first turn.", score: 0 };
     }
     
     const centerTile = placedTiles.find(tile => tile.row === 7 && tile.col === 7);
     if (!centerTile) {
-        return { valid: false, message: "One tile must be on the center square." };
+        return { valid: false, message: "One tile must be on the center square.", score: 0 };
     }
 
     const ret = checkWord(placedTiles);
     if (!ret.valid) {
-        return ret;
+        return { valid: false, message: ret.message, score: 0 };
     }
 
     const word = ret.words[0].map(tile => tile.letter).join('');
     if (!dictionary.has(word)) {
-        return { valid: false, message: "The word is not in the dictionary." };
+        return { valid: false, message: "The word is not in the dictionary.", score: 0 };
     }
     const wordScore = calculateWordScore(ret.words[0]);
 
@@ -196,7 +196,7 @@ export function validateFirstTurn(placedTiles) {
 
 export function validateSubsequentTurn(placedTiles) {
     if (placedTiles.length < 1) {
-        return { valid: false, message: "You must place at least one tile." };
+        return { valid: false, message: "You must place at least one tile.", score: 0 };
     }
 
     const connectsToExistingTile = placedTiles.some(tile => {
@@ -213,19 +213,19 @@ export function validateSubsequentTurn(placedTiles) {
         });
     });
     if (!connectsToExistingTile) {
-        return { valid: false, message: "At least one tile must connect to an existing tile." };
+        return { valid: false, message: "At least one tile must connect to an existing tile.", score: 0 };
     }
 
     const ret = checkWord(placedTiles);
     if (!ret.valid) {
-        return ret;
+        return { valid: false, message: ret.message, score: 0 };
     }
 
     let totalWordScore = 0;
     for (const wordTiles of ret.words) {
         const word = wordTiles.map(tile => tile.letter).join('');
         if (!dictionary.has(word)) {
-            return { valid: false, message: "The word is not in the dictionary." };
+            return { valid: false, message: "The word is not in the dictionary.", score: 0 };
         }
         totalWordScore += calculateWordScore(wordTiles);
     }
