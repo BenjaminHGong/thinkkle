@@ -7,6 +7,32 @@
 
 .title {
     text-align: center;
+    margin-top: 1vh;
+    font-size: 4vmin;
+}
+
+.info-container {
+    text-align: center;
+}
+
+#error-message {
+    text-align: center;
+    color: red
+}
+#error-message.fading-in {
+    animation: fadeIn 0.4s;
+}
+#error-message.fading-out {
+    animation: fadeOut 0.4s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
 
 /* Board style */
@@ -17,7 +43,7 @@
     width: 75vmin;
     height: 75vmin;
     font-size: 4vmin;
-    margin: auto;
+    margin: 0.5vh auto;
     border: 0.5vmin solid #000;
 }
 
@@ -150,6 +176,25 @@
     display: none; 
 }
 
+.rack .tile.fading-in {
+    animation: fadeIn 0.4s;
+}
+
+.rack .tile.fading-out {
+    animation: fadeOut 0.4s;
+}
+
+.tile.played {
+    animation: playedHighlight 0.4s ease-in-out;
+    background-color: #ffe066 !important;
+}
+
+@keyframes playedHighlight {
+    0%   { box-shadow: 0 0.1em rgb(141, 114, 33); }
+    40%  { box-shadow: 0 0 16px 4px #ffe066; }
+    100% { box-shadow: 0 0.1em rgb(141, 114, 33); }
+}
+
 /* Rack styles */
 .rack {
     display: flex;
@@ -188,12 +233,23 @@
 }
 
 /* Button styles */
+.button-container {
     display: flex;
+    justify-content: center;
+    gap: 1vmin;
+    margin: 0.5vh auto;
+}
+.button-container .button {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 3vmin;
     background-color: lavender;
     padding: 1vmin;
 }
 
+.rack .tile.selected-for-redraw {
+    outline: 3px solid red;
+    outline-offset: -2px;
+    background: #ffeaea;
+}
 
 
