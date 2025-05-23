@@ -169,6 +169,16 @@ export function calculateWordScore(wordTiles) {
 
     return score * wordMultiplier;
 }
+
+function getMoveCompliment(score) {
+    if (score >= 100) return "Unbelievable move!";
+    if (score >= 80) return "Legendary move!";
+    if (score >= 60) return "Amazing move!";
+    if (score >= 40) return "Great move!";
+    if (score >= 25) return "Nice move!";
+    if (score >= 10) return "Good move!";
+    return "OK move!";
+}
     
 export function validateFirstTurn(placedTiles) {
     if (placedTiles.length < 2) {
@@ -187,11 +197,16 @@ export function validateFirstTurn(placedTiles) {
 
     const word = ret.words[0].map(tile => tile.letter).join('');
     if (!dictionary.has(word)) {
-        return { valid: false, message: "The word is not in the dictionary.", score: 0 };
+        return { valid: false, message: `${word} is not in the dictionary.`, score: 0 };
     }
-    const wordScore = calculateWordScore(ret.words[0]);
+    let wordScore = calculateWordScore(ret.words[0]);
 
-    return { valid: true, message: "Valid first turn.", score: wordScore };
+    //Bingo bonus if all 7 tiles are placed
+    if (placedTiles.length === 7) {
+        wordScore += 50;
+    }
+
+    return { valid: true, message: getMoveCompliment(wordScore), score: wordScore };
 }
 
 export function validateSubsequentTurn(placedTiles) {
@@ -225,12 +240,17 @@ export function validateSubsequentTurn(placedTiles) {
     for (const wordTiles of ret.words) {
         const word = wordTiles.map(tile => tile.letter).join('');
         if (!dictionary.has(word)) {
-            return { valid: false, message: "The word is not in the dictionary.", score: 0 };
+            return { valid: false, message: `${word} is not in the dictionary.`, score: 0 };
         }
         totalWordScore += calculateWordScore(wordTiles);
     }
 
-    return { valid: true, message: "Valid subsequent turn.", score: totalWordScore};
+    //Bingo bonus if all 7 tiles are placed
+    if (placedTiles.length === 7) {
+        totalWordScore += 50;
+    }
+
+    return { valid: true, message: getMoveCompliment(totalWordScore), score: totalWordScore };
 }
 
 
