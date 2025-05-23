@@ -7,8 +7,6 @@
 
 .title {
     text-align: center;
-    margin: 2vh;
-    font-size: 5vmin;
 }
 
 /* Board style */
@@ -190,8 +188,6 @@
 }
 
 /* Button styles */
-#submit-button {
-    margin: 1vh auto;
     display: flex;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 3vmin;
