@@ -59,6 +59,11 @@ export function drawRack() {
             }
             const tile = new Tile(letter);
             rack.appendChild(tile.element);
+            tile.element.addEventListener('click', () => {
+                tile.element.classList.toggle('selected-for-redraw');
+            });
+            tile.element.classList.add('fading-in');
+            setTimeout(() => tile.element.classList.remove('fading-in'), 400);
         } else {
             // Remove letter if count is 0 (shouldn't happen, but safe)
             availableLetters.splice(randomIndex, 1);
@@ -72,5 +77,15 @@ export function addTileToRack(letter) {
     const newTile = new Tile(letter);
     rack.appendChild(newTile.element);
     rackLetters.push(letter); // Add the letter back to the rackLetters array
+    newTile.element.addEventListener('click', () => {
+        newTile.element.classList.toggle('selected-for-redraw');
+    });
+}
+
+export function addTileToBag(letter) {
+    if (tileBag[letter] !== undefined) {
+        tileBag[letter]++;
+        availableLetters.push(letter);
+    }
 }
 
