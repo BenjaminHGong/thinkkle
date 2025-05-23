@@ -37,6 +37,8 @@ function setupBoard() {
             }
             
             const tile = new Tile("", row, col);
+            const letterSpan = tile.element.querySelector('.tile-letter');
+            letterSpan.contentEditable = true; // Make the letter editable
             square.appendChild(tile.element);
             square.tileInstance = tile;
             board.appendChild(square);

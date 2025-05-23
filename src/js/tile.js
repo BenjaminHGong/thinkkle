@@ -8,7 +8,6 @@ export class Tile {
 
         this.letterSpan = document.createElement('span');
         this.letterSpan.classList.add('tile-letter');
-        this.letterSpan.contentEditable = true; // Make the letter editable
         this.letterSpan.textContent = letter;
         this.element.appendChild(this.letterSpan);
 
