@@ -4,7 +4,7 @@ export class Tile {
     constructor(letter = "", row = -1, col = -1) {
         this.letter = letter;
         this.element = document.createElement('div');
-        this.element.classList.add('tile', 'shadow'); 
+        this.element.classList.add('tile'); 
 
         this.letterSpan = document.createElement('span');
         this.letterSpan.classList.add('tile-letter');
@@ -22,6 +22,8 @@ export class Tile {
         if (letter === "Q" || letter === "X") {
             this.letterSpan.style.paddingRight = "0.2em";
         }
+
+        this.element.tileInstance = this;
     }
 
     getLetter() {

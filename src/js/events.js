@@ -1,5 +1,5 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
-import { getRackLetters, setRackLetters, addTileToRack, drawRack, addTileToBag } from "./rack.js"; // Import rack functions
+import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag } from "./rack.js"; // Import rack functions
 import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
 const squares = document.querySelectorAll(".square"); //Array of all cells in the board
@@ -15,26 +15,21 @@ squares.forEach(square => {
         if (e.inputType.startsWith("delete")) return;
 
         //Allow movement to the next tile on top of already placed tiles
-        if (!isFirstTurn() && tile.dataset.newlyPlaced === "false") return;
+        if (square.classList.contains('filled') && tile.dataset.newlyPlaced === "false") return;
 
         // If input is a single alphabetical character, allow it
         const text = e.data?.toUpperCase();
         const letter = letterSpan.textContent;
         let rackLetters = getRackLetters(); // Get the current letters in the rack
+        console.log(rackLetters);
         if (!(/^[A-Z]$/.test(text) && rackLetters.includes(text))) {
             e.preventDefault(); // Block input
         } else if (square.classList.contains('empty') || tile.dataset.newlyPlaced === "true") {
-            const index = rackLetters.indexOf(text);
-            if (index !== -1) {
-                rackLetters.splice(index, 1); // Remove from rackLetters
-                const rackTile = document.querySelector(`.rack .tile:nth-child(${index + 1})`);
-                if (rackTile) rackTile.remove(); // Remove from the rack display
-                if (letter) addTileToRack(letter); // Add the letter back to the rack if it was already there
-            }
+            console.log(`Adding letter ${text} to rackLetters`);
+            addTileToRack(letter);
+            removeTileFromRack(text); // Remove the letter from the rack if it exists
             letterSpan.textContent = ""; // Clear the cell before setting the new value
-            
         }
-        setRackLetters(rackLetters); // Update the rack letters in the module
     });
     
     letterSpan.addEventListener("input", (e) => {
@@ -240,25 +235,33 @@ submitButton.addEventListener("click", () => {
 });
 
 document.getElementById('redraw-button').addEventListener('click', () => {
+    document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tile => {
+        const tileInstance = tile.tileInstance;
+        const letter = tileInstance.getLetter();
+        if (letter) {
+            addTileToRack(letter);
+            tileInstance.clear(); // Clear the tile
+        }
+    });
+
     const rack = document.querySelector('.rack');
     const selectedTiles = Array.from(rack.querySelectorAll('.tile.selected-for-redraw'));
     if (selectedTiles.length === 0) return;
 
-    let rackLetters = getRackLetters();
+    let completed = 0;
+    const total = selectedTiles.length;
 
     selectedTiles.forEach(tile => {
         const letterSpan = tile.querySelector('.tile-letter');
         const letter = letterSpan.textContent[0]; // Assumes letter is first character
-        // Remove from rackLetters
-        const idx = rackLetters.indexOf(letter);
-        if (idx !== -1) rackLetters.splice(idx, 1);
-        // Remove from DOM
         tile.classList.add('fading-out');
         setTimeout(() => {
-            tile.remove();
             addTileToBag(letter);
-            setRackLetters(rackLetters);
-            drawRack();
+            removeTileFromRack(letter); // Remove the letter from the rackLetters array
+            completed++;
+            if (completed === total) {
+                drawRack(); // Only redraw once, after all selected tiles are removed
+            }
         }, 400);
     });
 

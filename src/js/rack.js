@@ -37,10 +37,6 @@ export function getRackLetters() {
     return rackLetters;
 }
 
-export function setRackLetters(letters) {
-    rackLetters = letters;
-}
-
 export function drawRack() {
     const rack = document.querySelector('.rack');
     while (rackLetters.length < 7) {
@@ -73,6 +69,7 @@ export function drawRack() {
 }
 
 export function addTileToRack(letter) {
+    if (!letter) return; // Prevent adding empty tiles
     const rack = document.querySelector('.rack');
     const newTile = new Tile(letter);
     rack.appendChild(newTile.element);
@@ -80,6 +77,22 @@ export function addTileToRack(letter) {
     newTile.element.addEventListener('click', () => {
         newTile.element.classList.toggle('selected-for-redraw');
     });
+    console.log(rackLetters)
+}
+
+export function removeTileFromRack(letter) {
+    // Find the index of the letter in rackLetters
+    const index = rackLetters.indexOf(letter);
+    if (index !== -1) {
+        rackLetters.splice(index, 1); // Remove from rackLetters
+
+        // Remove the corresponding tile element from the rack DOM
+        const rack = document.querySelector('.rack');
+        // Find the nth tile (index + 1 because nth-child is 1-based)
+        const rackTile = rack.querySelector(`.tile:nth-child(${index + 1})`);
+        if (rackTile) rackTile.remove();
+    }
+    console.log(rackLetters);
 }
 
 export function addTileToBag(letter) {

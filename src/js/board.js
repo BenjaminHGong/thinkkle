@@ -11,8 +11,7 @@ function setupBoard() {
             const specialSquare = specialSquares.find(t => t.row === row && t.col === col);
 
             square.classList.add('square'); // Add class for each square
-            square.classList.add('empty'); // Add class for empty squares 
-    
+            
             if (specialSquare) {
                 if (specialSquare.type === 'star') {
                     square.textContent = '★';
@@ -35,7 +34,9 @@ function setupBoard() {
             else {
                 square.classList.add('normal'); // Add a class for normal squares
             }
-            
+
+            square.classList.add('empty'); // Add class for empty squares 
+
             const tile = new Tile("", row, col);
             const letterSpan = tile.element.querySelector('.tile-letter');
             letterSpan.contentEditable = true; // Make the letter editable
