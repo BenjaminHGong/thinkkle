@@ -150,18 +150,20 @@ export function calculateWordScore(wordTiles) {
         const square = tile.element.closest('.square');
         let letterMultiplier = 1;
 
-        // Check for letter bonuses
-        if (square.classList.contains('double-letter')) {
-            letterMultiplier = 2;
-        } else if (square.classList.contains('triple-letter')) {
-            letterMultiplier = 3;
-        }
+        // Check for letter bonuses (only if newly placed)
+        if (tile.element.dataset.newlyPlaced === "true") {
+            if (square.classList.contains('double-letter')) {
+                letterMultiplier = 2;
+            } else if (square.classList.contains('triple-letter')) {
+                letterMultiplier = 3;
+            }
 
-        // Check for word bonuses
-        if (square.classList.contains('double-word') || square.classList.contains('star')) {
-            wordMultiplier *= 2;
-        } else if (square.classList.contains('triple-word')) {
-            wordMultiplier *= 3;
+            // Check for word bonuses (only if newly placed)
+            if (square.classList.contains('double-word') || square.classList.contains('star')) {
+                wordMultiplier *= 2;
+            } else if (square.classList.contains('triple-word')) {
+                wordMultiplier *= 3;
+            }
         }
 
         score += letterScore * letterMultiplier;
