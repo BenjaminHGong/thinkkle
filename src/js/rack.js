@@ -77,7 +77,6 @@ export function addTileToRack(letter) {
     newTile.element.addEventListener('click', () => {
         newTile.element.classList.toggle('selected-for-redraw');
     });
-    console.log(rackLetters)
 }
 
 export function removeTileFromRack(letter) {
@@ -92,7 +91,6 @@ export function removeTileFromRack(letter) {
         const rackTile = rack.querySelector(`.tile:nth-child(${index + 1})`);
         if (rackTile) rackTile.remove();
     }
-    console.log(rackLetters);
 }
 
 export function addTileToBag(letter) {

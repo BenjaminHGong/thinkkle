@@ -21,11 +21,9 @@ squares.forEach(square => {
         const text = e.data?.toUpperCase();
         const letter = letterSpan.textContent;
         let rackLetters = getRackLetters(); // Get the current letters in the rack
-        console.log(rackLetters);
         if (!(/^[A-Z]$/.test(text) && rackLetters.includes(text))) {
             e.preventDefault(); // Block input
         } else if (square.classList.contains('empty') || tile.dataset.newlyPlaced === "true") {
-            console.log(`Adding letter ${text} to rackLetters`);
             addTileToRack(letter);
             removeTileFromRack(text); // Remove the letter from the rack if it exists
             letterSpan.textContent = ""; // Clear the cell before setting the new value
