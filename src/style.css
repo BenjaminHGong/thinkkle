@@ -114,6 +114,7 @@
     border-radius: 20%;
     background-color: rgb(252, 202, 50);
     bottom: 5%;
+    box-shadow: 0 0.1em rgb(141, 114, 33);
 }
 
 .square .tile {
@@ -140,13 +141,6 @@
 .square.empty .tile {
     background-color: transparent;
     outline: none;
-}
-
-.tile.shadow {
-    box-shadow: 0 0.1em rgb(141, 114, 33);
-}
-
-.square.empty .tile.shadow {
     box-shadow: none;
 }
 
