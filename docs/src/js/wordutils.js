@@ -1,7 +1,7 @@
 import { rowLength, columnLength, tileValues } from './constants.js';
 
 const dictionary = new Set();
-fetch('wordlist.txt')
+fetch('../wordlist.txt')
     .then(response => response.text())
     .then(data => {
         const words = data.split('\n').map(word => word.trim());
