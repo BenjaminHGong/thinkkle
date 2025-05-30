@@ -1,21 +1,20 @@
-import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js"; // Import the indicator functions
-import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag } from "./rack.js"; // Import rack functions
-import { rowLength, columnLength } from './constants.js'; // Import constants for board dimensions
+import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js";
+import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag } from "./rack.js";
+import { rowLength, columnLength } from './constants.js';
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
-const squares = document.querySelectorAll(".square"); //Array of all cells in the board
+const squares = document.querySelectorAll(".square");
 
 squares.forEach(square => {
-    const tile = square.querySelector('.tile');
     const tileInstance = square.tileInstance;
-    const letterSpan = tile.querySelector('.tile-letter');
-    letterSpan.contentEditable = true; // Make the letter editable
+    const letterSpan = tileInstance.getLetterSpan();
+    letterSpan.contentEditable = true;
 
     letterSpan.addEventListener('beforeinput', (e) => {
         // Allow deletions
         if (e.inputType.startsWith("delete")) return;
 
         //Allow movement to the next tile on top of already placed tiles
-        if (square.classList.contains('filled') && tile.dataset.newlyPlaced === "false") return;
+        if (square.classList.contains('filled') && tileInstance.getData('newlyPlaced') === "false") return;
 
         // If input is a single alphabetical character, allow it
         const text = e.data?.toUpperCase();
@@ -23,7 +22,7 @@ squares.forEach(square => {
         let rackLetters = getRackLetters(); // Get the current letters in the rack
         if (!(/^[A-Z]$/.test(text) && rackLetters.includes(text))) {
             e.preventDefault(); // Block input
-        } else if (square.classList.contains('empty') || tile.dataset.newlyPlaced === "true") {
+        } else if (square.classList.contains('empty') || tileInstance.getData('newlyPlaced') === "true") {
             addTileToRack(letter);
             removeTileFromRack(text); // Remove the letter from the rack if it exists
             letterSpan.textContent = ""; // Clear the cell before setting the new value
@@ -31,7 +30,7 @@ squares.forEach(square => {
     });
     
     letterSpan.addEventListener("input", (e) => {
-        if (square.classList.contains('filled') && tile.dataset.newlyPlaced === "false") {
+        if (square.classList.contains('filled') && tileInstance.getData('newlyPlaced') === "false") {
             if (letterSpan.textContent !== tileInstance.getLetter()) {
                 letterSpan.textContent = tileInstance.getLetter();
             }
@@ -40,35 +39,35 @@ squares.forEach(square => {
             let inputLetter = letterSpan.textContent.slice(0, 1).toUpperCase();
             if (square.classList.contains('empty')) {
                 tileInstance.setLetter(inputLetter); // Set the letter in the tile
-                tile.dataset.newlyPlaced = "true"; // Mark the tile as newly placed
+                tileInstance.setData('newlyPlaced', "true"); // Mark the tile as newly placed
 
             }
-            else if (tile.dataset.newlyPlaced === "true") {
+            else if (tileInstance.getData('newlyPlaced') === "true") {
                 tileInstance.setLetter(inputLetter); // Set the letter in the tile
             }
         }
         
-        const currentRow = parseInt(tile.dataset.row);
-        const currentCol = parseInt(tile.dataset.col);
+        const currentRow = parseInt(tileInstance.getData('row'));
+        const currentCol = parseInt(tileInstance.getData('col'));
 
-        let nextTile;
+        let nextTileInstance;
         const currentDirection = getDirection(); // Get the current direction from the indicator module
         if (currentDirection === 'right') {
-            nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol + 1}']`);
+            nextTileInstance = getTileInstanceByCoords(currentRow, currentCol + 1);
         } 
         else if (currentDirection === 'down') {
-            nextTile = document.querySelector(`.tile[data-row='${currentRow + 1}'][data-col='${currentCol}']`);
+            nextTileInstance = getTileInstanceByCoords(currentRow + 1, currentCol);
         }                
 
-        if (nextTile) {
-            const nextLetterSpan = nextTile.querySelector('.tile-letter');
+        if (nextTileInstance) {
+            const nextLetterSpan = nextTileInstance.getLetterSpan();
             nextLetterSpan.focus();
-            moveIndicator(nextTile);
+            moveIndicator(nextTileInstance.getElement());
         }
     });
 
     letterSpan.addEventListener('focus', () => {
-        moveIndicator(tile);
+        moveIndicator(tileInstance.getElement());
     });
 
     // Prevent dragging and dropping text into the tile
@@ -84,34 +83,34 @@ squares.forEach(square => {
     // Delete cell content on Backspace or Delete key press
     letterSpan.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
-            if (tile.dataset.newlyPlaced !== "false") {
+            if (tileInstance.getData('newlyPlaced') !== "false") {
                 const letter = letterSpan.textContent;
                 if (letter) addTileToRack(letter); // Add the letter back to the rack
                 tileInstance.clear(); // Clear the tile
             }
             e.preventDefault(); 
-            const currentRow = parseInt(tile.dataset.row);
-            const currentCol = parseInt(tile.dataset.col);
+            const currentRow = parseInt(tileInstance.getData('row'));
+            const currentCol = parseInt(tileInstance.getData('col'));
             const currentDirection = getDirection(); // Get the current direction from the indicator module
-            let nextTile;
+            let nextTileInstance;
             if (currentDirection === 'right') {
-                nextTile = document.querySelector(`.tile[data-row='${currentRow}'][data-col='${currentCol - 1}']`);
+                nextTileInstance = getTileInstanceByCoords(currentRow, currentCol - 1);
             } 
             else if (currentDirection === 'down') {
-                nextTile = document.querySelector(`.tile[data-row='${currentRow - 1}'][data-col='${currentCol}']`);
+                nextTileInstance = getTileInstanceByCoords(currentRow - 1, currentCol);
             }
-            if (nextTile) {
-                const nextLetterSpan = nextTile.querySelector('.tile-letter');
+            if (nextTileInstance) {
+                const nextLetterSpan = nextTileInstance.getLetterSpan();
                 nextLetterSpan.focus();
-                moveIndicator(nextTile);
+                moveIndicator(nextTileInstance.getElement());
             }
         }
     });
 
       // Handle navigation with arrow keys
     letterSpan.addEventListener('keydown', (e) => {
-        const currentRow = parseInt(tile.dataset.row);
-        const currentCol = parseInt(tile.dataset.col);
+        const currentRow = parseInt(tileInstance.getData('row'));
+        const currentCol = parseInt(tileInstance.getData('col'));
         const currentDirection = getDirection(); // Get the current direction from the indicator module
         let newRow = currentRow;
         let newCol = currentCol;
@@ -125,7 +124,7 @@ squares.forEach(square => {
             }
             else {
                 setDirection('down');
-                moveIndicator(tile);
+                moveIndicator(tileInstance.getElement());
             }
         } 
         else if (e.key === 'ArrowLeft') {
@@ -138,7 +137,7 @@ squares.forEach(square => {
             }
             else {
                 setDirection('right');
-                moveIndicator(tile);
+                moveIndicator(tileInstance.getElement());
             }
         }
         else return;
@@ -148,9 +147,9 @@ squares.forEach(square => {
         // Clamp the coordinates within board bounds
         if (newRow < 0 || newRow >= rowLength || newCol < 0 || newCol >= columnLength) return;
     
-        const nextTile = document.querySelector(`.tile[data-row='${newRow}'][data-col='${newCol}']`);
-        if (nextTile) {
-            const nextLetterSpan = nextTile.querySelector('.tile-letter');
+        const nextTileInstance = getTileInstanceByCoords(newRow, newCol);
+        if (nextTileInstance) {
+            const nextLetterSpan = nextTileInstance.getLetterSpan();
             nextLetterSpan.focus();
         }
     });
@@ -166,6 +165,13 @@ squares.forEach(square => {
         hideIndicator(); // Hide the indicator when the tile loses focus
     });
 });
+
+// Helper function to get tileInstance by row and col
+function getTileInstanceByCoords(row, col) {
+    const tileElem = document.querySelector(`.tile[data-row='${row}'][data-col='${col}']`);
+    if (!tileElem) return null;
+    return tileElem.tileInstance;
+}
 
 const submitButton = document.getElementById("submit-button");
 const errorMessage = document.getElementById("error-message");
@@ -188,11 +194,12 @@ function showError(msg) {
 
 submitButton.addEventListener("click", () => {
     let placedTiles = []
-    document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tile => {
-        const row = parseInt(tile.dataset.row);
-        const col = parseInt(tile.dataset.col);
-        const letterSpan = tile.querySelector('.tile-letter');
-        placedTiles.push({row, col, letter: letterSpan.textContent, element: tile});
+    document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tileElem => {
+        const tileInstance = tileElem.tileInstance;
+        const row = parseInt(tileInstance.getData('row'));
+        const col = parseInt(tileInstance.getData('col'));
+        const letterSpan = tileInstance.getLetterSpan();
+        placedTiles.push({row, col, letter: letterSpan.textContent, instance: tileInstance});
     });
 
     let validationResult;
@@ -213,10 +220,10 @@ submitButton.addEventListener("click", () => {
         }
     }
     placedTiles.forEach(tile => {
-        tile.element.dataset.newlyPlaced = "false"; // Mark the tile as not newly placed
-        tile.element.classList.add('played');
-        setTimeout(() => tile.element.classList.remove('played'), 500);
-        tile.element.dataset.newlyPlaced = "false";
+        tile.instance.setData('newlyPlaced', "false"); // Mark the tile as not newly placed
+        tile.instance.getElement().classList.add('played');
+        setTimeout(() => tile.instance.getElement().classList.remove('played'), 500);
+        tile.instance.setData('newlyPlaced', "false");
     });
 
     drawRack(); // Draw a new rack after the first turn
@@ -233,8 +240,8 @@ submitButton.addEventListener("click", () => {
 });
 
 document.getElementById('redraw-button').addEventListener('click', () => {
-    document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tile => {
-        const tileInstance = tile.tileInstance;
+    document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tileElem => {
+        const tileInstance = tileElem.tileInstance;
         const letter = tileInstance.getLetter();
         if (letter) {
             addTileToRack(letter);
@@ -249,10 +256,11 @@ document.getElementById('redraw-button').addEventListener('click', () => {
     let completed = 0;
     const total = selectedTiles.length;
 
-    selectedTiles.forEach(tile => {
-        const letterSpan = tile.querySelector('.tile-letter');
+    selectedTiles.forEach(tileElem => {
+        const tileInstance = tileElem.tileInstance;
+        const letterSpan = tileInstance.getLetterSpan();
         const letter = letterSpan.textContent[0]; // Assumes letter is first character
-        tile.classList.add('fading-out');
+        tileElem.classList.add('fading-out');
         setTimeout(() => {
             addTileToBag(letter);
             removeTileFromRack(letter); // Remove the letter from the rackLetters array
