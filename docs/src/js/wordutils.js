@@ -1,7 +1,7 @@
 import { rowLength, columnLength, tileValues } from './constants.js';
 
 const dictionary = new Set();
-fetch('../wordlist.txt')
+fetch('wordlist.txt')
     .then(response => response.text())
     .then(data => {
         const words = data.split('\n').map(word => word.trim());
@@ -225,8 +225,11 @@ export function validateSubsequentTurn(placedTiles) {
         ];
         return adjacentTiles.some(adjTile => {
             const existingTile = document.querySelector(`.tile[data-row='${adjTile.row}'][data-col='${adjTile.col}']`);
+            if (!existingTile) return false;
             const existingLetterSpan = existingTile.querySelector('.tile-letter');
-            return existingTile && existingLetterSpan.textContent !== "" && existingTile.dataset.newlyPlaced !== "true";
+            return existingLetterSpan &&
+                existingLetterSpan.textContent !== "" &&
+                existingTile.dataset.newlyPlaced !== "true";
         });
     });
     if (!connectsToExistingTile) {
