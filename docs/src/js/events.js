@@ -116,6 +116,7 @@ squares.forEach(square => {
         let newCol = currentCol;
         if (e.key === 'ArrowUp') {
             setDirection('down'); 
+            moveIndicator(tileInstance.getElement());
             newRow--;
         }
         else if (e.key === 'ArrowDown') {
@@ -129,6 +130,7 @@ squares.forEach(square => {
         } 
         else if (e.key === 'ArrowLeft') {
             setDirection('right');
+            moveIndicator(tileInstance.getElement());
             newCol--;
         }
         else if (e.key === 'ArrowRight') {
