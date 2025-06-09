@@ -9,7 +9,7 @@ fetch('wordlist.txt')
     })
     .catch(error => console.error('Error loading word list:', error));
 
-let firstTurn = true; // Flag to check if it's the first turn
+let firstTurn = true; 
 export function isFirstTurn() {
     return firstTurn;
 }
@@ -32,7 +32,8 @@ function formWord(row, col, dy, dx) {
                 letter: letterSpan.textContent,
                 element: tile
             });
-        } else {
+        } 
+        else {
             break;
         }
         currentRow += dy;
@@ -64,7 +65,7 @@ function addPerpendicularWords(words, placedTiles, dy, dx) {
     placedTiles.forEach(tile => {
         let startRow = tile.row;
         let startCol = tile.col;
-        // Find the start of the perpendicular word
+        
         while (
             startRow - dy >= 0 &&
             startCol - dx >= 0 &&
@@ -106,7 +107,8 @@ function checkConnectedTiles(placedTiles, direction) {
         if (!areTilesConnected(placedTiles, 'col')) {
             return { valid: false, message: "All tiles should be placed next to each other." };
         }
-    } else if (direction === 'vertical') {
+    } 
+    else if (direction === 'vertical') {
         placedTiles.sort((a, b) => a.row - b.row);
         const mainWord = getWord(placedTiles[0].row, placedTiles[0].col, 1, 0);
         if (mainWord.length > 1) words.push(mainWord);
@@ -141,7 +143,7 @@ function checkWord(placedTiles) {
 }
 
 export function calculateWordScore(wordTiles) {
-    // wordTiles: array of {row, col, letter, element}
+    
     let score = 0;
     let wordMultiplier = 1;
 
@@ -150,18 +152,20 @@ export function calculateWordScore(wordTiles) {
         const square = tile.element.closest('.square');
         let letterMultiplier = 1;
 
-        // Check for letter bonuses (only if newly placed)
+        
         if (tile.element.dataset.newlyPlaced === "true") {
             if (square.classList.contains('double-letter')) {
                 letterMultiplier = 2;
-            } else if (square.classList.contains('triple-letter')) {
+            } 
+            else if (square.classList.contains('triple-letter')) {
                 letterMultiplier = 3;
             }
 
-            // Check for word bonuses (only if newly placed)
+            
             if (square.classList.contains('double-word') || square.classList.contains('star')) {
                 wordMultiplier *= 2;
-            } else if (square.classList.contains('triple-word')) {
+            } 
+            else if (square.classList.contains('triple-word')) {
                 wordMultiplier *= 3;
             }
         }
@@ -203,7 +207,7 @@ export function validateFirstTurn(placedTiles) {
     }
     let wordScore = calculateWordScore(ret.words[0]);
 
-    //Bingo bonus if all 7 tiles are placed
+    
     if (placedTiles.length === 7) {
         wordScore += 50;
     }
@@ -250,7 +254,6 @@ export function validateSubsequentTurn(placedTiles) {
         totalWordScore += calculateWordScore(wordTiles);
     }
 
-    //Bingo bonus if all 7 tiles are placed
     if (placedTiles.length === 7) {
         totalWordScore += 50;
     }

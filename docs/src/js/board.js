@@ -10,7 +10,7 @@ function setupBoard() {
             const square = document.createElement('div');
             const specialSquare = specialSquares.find(t => t.row === row && t.col === col);
 
-            square.classList.add('square'); // Add class for each square
+            square.classList.add('square'); 
             
             if (specialSquare) {
                 if (specialSquare.type === 'star') {
@@ -28,18 +28,18 @@ function setupBoard() {
                 else if (specialSquare.type === 'triple-letter') {
                     square.textContent = '3L';
                 }
-                square.classList.add(specialSquare.type); // Add class based on square type
+                square.classList.add(specialSquare.type);
                 square.dataset.wordBonus = square.textContent
             }
             else {
-                square.classList.add('normal'); // Add a class for normal squares
+                square.classList.add('normal'); 
             }
 
-            square.classList.add('empty'); // Add class for empty squares 
+            square.classList.add('empty'); 
 
             const tile = new Tile("", row, col);
             const letterSpan = tile.element.querySelector('.tile-letter');
-            letterSpan.contentEditable = true; // Make the letter editable
+            letterSpan.contentEditable = true; 
             square.appendChild(tile.element);
             square.tileInstance = tile;
             board.appendChild(square);
@@ -47,5 +47,23 @@ function setupBoard() {
     }
 }
 
-
 setupBoard();
+
+export function getBoardAs2DArray() {
+    const boardArray = [];
+    const squares = document.querySelectorAll('.square');
+
+    for (let row = 0; row < rowLength; row++) {
+        const rowArray = [];
+        for (let col = 0; col < columnLength; col++) {
+            const squareIndex = row * columnLength + col;
+            const square = squares[squareIndex];
+            if (square) {
+                rowArray.push(square.tileInstance.getLetter());
+            }
+        }
+        boardArray.push(rowArray);
+    }
+
+    return boardArray;
+}

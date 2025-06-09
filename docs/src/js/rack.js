@@ -31,7 +31,49 @@ let tileBag = {
 
 let availableLetters = Object.keys(tileBag).filter(letter => tileBag[letter] > 0);
 let rackLetters = []
-drawRack(); // Initial draw of the rack
+drawRack(); 
+let botRackLetters = [];
+drawBotRack(); 
+
+export function getBotRackLetters() {
+    return botRackLetters;
+}
+
+export function drawBotRack() {
+    while (botRackLetters.length < 7) {
+        if (availableLetters.length === 0) break;
+        const randomIndex = Math.floor(Math.random() * availableLetters.length);
+        const letter = availableLetters[randomIndex];
+        if (tileBag[letter] > 0) {
+            botRackLetters.push(letter);
+            tileBag[letter]--;
+            if (tileBag[letter] === 0) {
+                availableLetters.splice(randomIndex, 1);
+            }
+        } 
+        else {
+            availableLetters.splice(randomIndex, 1);
+        }
+    }
+    console.log("Bot Rack Letters:", botRackLetters);
+    return botRackLetters;
+}
+
+export function removeTileFromBotRack(letter) {
+    const index = botRackLetters.indexOf(letter);
+    if (index !== -1) {
+        botRackLetters.splice(index, 1);
+    }
+}
+
+export function redrawBotRack() {
+    while (botRackLetters.length > 0) {
+        removeTileFromBotRack(botRackLetters[0]); 
+        addTileToBag(botRackLetters[0]); 
+    }
+    drawBotRack(); 
+    console.log("Bot redrew Rack Letters:", botRackLetters);
+}
 
 export function getRackLetters() {
     return rackLetters;
@@ -40,18 +82,14 @@ export function getRackLetters() {
 export function drawRack() {
     const rack = document.querySelector('.rack');
     while (rackLetters.length < 7) {
-        if (availableLetters.length === 0) break; // Stop if the bag is empty
-
-        // Pick a random letter
+        if (availableLetters.length === 0) break; 
         const randomIndex = Math.floor(Math.random() * availableLetters.length);
         const letter = availableLetters[randomIndex];
-
-        // Double-check the count before drawing
         if (tileBag[letter] > 0) {
             rackLetters.push(letter);
             tileBag[letter]--;
             if (tileBag[letter] === 0) {
-                availableLetters.splice(randomIndex, 1); // Remove letter if count reaches 0
+                availableLetters.splice(randomIndex, 1); 
             }
             const tile = new Tile(letter);
             rack.appendChild(tile.element);
@@ -60,8 +98,9 @@ export function drawRack() {
             });
             tile.element.classList.add('fading-in');
             setTimeout(() => tile.element.classList.remove('fading-in'), 400);
-        } else {
-            // Remove letter if count is 0 (shouldn't happen, but safe)
+        } 
+        else {
+            
             availableLetters.splice(randomIndex, 1);
         }
     }
@@ -69,25 +108,21 @@ export function drawRack() {
 }
 
 export function addTileToRack(letter) {
-    if (!letter) return; // Prevent adding empty tiles
+    if (!letter) return; 
     const rack = document.querySelector('.rack');
     const newTile = new Tile(letter);
     rack.appendChild(newTile.element);
-    rackLetters.push(letter); // Add the letter back to the rackLetters array
+    rackLetters.push(letter); 
     newTile.element.addEventListener('click', () => {
         newTile.element.classList.toggle('selected-for-redraw');
     });
 }
 
 export function removeTileFromRack(letter) {
-    // Find the index of the letter in rackLetters
     const index = rackLetters.indexOf(letter);
     if (index !== -1) {
-        rackLetters.splice(index, 1); // Remove from rackLetters
-
-        // Remove the corresponding tile element from the rack DOM
+        rackLetters.splice(index, 1); 
         const rack = document.querySelector('.rack');
-        // Find the nth tile (index + 1 because nth-child is 1-based)
         const rackTile = rack.querySelector(`.tile:nth-child(${index + 1})`);
         if (rackTile) rackTile.remove();
     }
@@ -100,3 +135,9 @@ export function addTileToBag(letter) {
     }
 }
 
+export function isGameOver() {
+    const playerRack = getRackLetters();
+    const botRack = getBotRackLetters();
+    const bagEmpty = Object.values(tileBag).every(count => count === 0);
+    return bagEmpty && playerRack.length === 0 && botRack.length === 0;
+}

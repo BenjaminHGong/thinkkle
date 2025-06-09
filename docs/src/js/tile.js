@@ -33,23 +33,23 @@ export class Tile {
     setLetter(letter) {
         this.letter = letter;
         this.letterSpan.textContent = letter;
-        this.scoreSpan.textContent = tileValues[letter] || 0; // Update score based on the new letter
+        this.scoreSpan.textContent = tileValues[letter] || 0; 
         if (letter === 'Q' || letter === 'X') {
             this.letterSpan.style.marginRight = '0.2em';
         }
         this.getSquare().classList.remove('empty'); 
-        this.getSquare().classList.add('filled'); // Add filled class
+        this.getSquare().classList.add('filled'); 
     }
 
     clear() {
         this.setLetter('');
         this.element.dataset.newlyPlaced = 'false'; 
         this.getSquare().classList.remove('filled'); 
-        this.getSquare().classList.add('empty'); // Add empty class
+        this.getSquare().classList.add('empty'); 
     }
 
     getSquare() {
-        return this.element.parentElement; // Get the parent square of the tile
+        return this.element.parentElement; 
     }
 
     getLetterSpan() {

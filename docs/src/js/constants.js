@@ -1,11 +1,8 @@
 export const rowLength = 15 
 export const columnLength = 15
 export const specialSquares = [
-
-    // Center Star Square
-    { row: 7, col: 7, type: 'star' }, 
-
-    // Double Word Squares
+    { row: 7, col: 7, type: 'star' },
+     
     { row: 1, col: 1, type: 'double-word' },
     { row: 1, col: 13, type: 'double-word' },
     { row: 2, col: 2, type: 'double-word' },
@@ -23,7 +20,6 @@ export const specialSquares = [
     { row: 13, col: 1, type: 'double-word' },
     { row: 13, col: 13, type: 'double-word' },
 
-    // Triple Word Squares
     { row: 0, col: 0, type: 'triple-word' },
     { row: 0, col: 7, type: 'triple-word' },
     { row: 0, col: 14, type: 'triple-word' },
@@ -33,7 +29,6 @@ export const specialSquares = [
     { row: 14, col: 7, type: 'triple-word' },
     { row: 14, col: 14, type: 'triple-word' },
 
-    // Double Letter Squares
     { row: 0, col: 3, type: 'double-letter' },
     { row: 0, col: 11, type: 'double-letter' },
     { row: 2, col: 6, type: 'double-letter' },
@@ -58,8 +53,7 @@ export const specialSquares = [
     { row: 12, col: 8, type: 'double-letter' },
     { row: 14, col: 3, type: 'double-letter' },
     { row: 14, col: 11, type: 'double-letter' },
-
-    // Triple Letter Squares
+    
     { row: 1, col: 5, type: 'triple-letter' },
     { row: 1, col: 9, type: 'triple-letter' },
     { row: 5, col: 1, type: 'triple-letter' },
