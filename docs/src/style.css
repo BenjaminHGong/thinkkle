@@ -13,6 +13,7 @@
 
 .info-container {
     text-align: center;
+    font-size: 2vmin;
 }
 
 #error-message {
