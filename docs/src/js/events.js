@@ -1,7 +1,8 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js";
-import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag } from "./rack.js";
-import { rowLength, columnLength } from './constants.js';
+import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag, getBotRackLetters, redrawBotRack, removeTileFromBotRack, drawBotRack, isGameOver } from "./rack.js";
+import { rowLength, columnLength, specialSquares } from './constants.js';
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
+import { getBoardAs2DArray } from './board.js';
 const squares = document.querySelectorAll(".square");
 
 squares.forEach(square => {
@@ -10,22 +11,18 @@ squares.forEach(square => {
     letterSpan.contentEditable = true;
 
     letterSpan.addEventListener('beforeinput', (e) => {
-        // Allow deletions
         if (e.inputType.startsWith("delete")) return;
-
-        //Allow movement to the next tile on top of already placed tiles
         if (square.classList.contains('filled') && tileInstance.getData('newlyPlaced') === "false") return;
-
-        // If input is a single alphabetical character, allow it
         const text = e.data?.toUpperCase();
         const letter = letterSpan.textContent;
-        let rackLetters = getRackLetters(); // Get the current letters in the rack
+        let rackLetters = getRackLetters();
         if (!(/^[A-Z]$/.test(text) && rackLetters.includes(text))) {
-            e.preventDefault(); // Block input
-        } else if (square.classList.contains('empty') || tileInstance.getData('newlyPlaced') === "true") {
+            e.preventDefault();
+        } 
+        else if (square.classList.contains('empty') || tileInstance.getData('newlyPlaced') === "true") {
             addTileToRack(letter);
-            removeTileFromRack(text); // Remove the letter from the rack if it exists
-            letterSpan.textContent = ""; // Clear the cell before setting the new value
+            removeTileFromRack(text);
+            letterSpan.textContent = "";
         }
     });
     
@@ -38,12 +35,11 @@ squares.forEach(square => {
         else {
             let inputLetter = letterSpan.textContent.slice(0, 1).toUpperCase();
             if (square.classList.contains('empty')) {
-                tileInstance.setLetter(inputLetter); // Set the letter in the tile
-                tileInstance.setData('newlyPlaced', "true"); // Mark the tile as newly placed
-
+                tileInstance.setLetter(inputLetter);
+                tileInstance.setData('newlyPlaced', "true");
             }
             else if (tileInstance.getData('newlyPlaced') === "true") {
-                tileInstance.setLetter(inputLetter); // Set the letter in the tile
+                tileInstance.setLetter(inputLetter);
             }
         }
         
@@ -51,7 +47,7 @@ squares.forEach(square => {
         const currentCol = parseInt(tileInstance.getData('col'));
 
         let nextTileInstance;
-        const currentDirection = getDirection(); // Get the current direction from the indicator module
+        const currentDirection = getDirection();
         if (currentDirection === 'right') {
             nextTileInstance = getTileInstanceByCoords(currentRow, currentCol + 1);
         } 
@@ -70,28 +66,25 @@ squares.forEach(square => {
         moveIndicator(tileInstance.getElement());
     });
 
-    // Prevent dragging and dropping text into the tile
     letterSpan.addEventListener('dragstart', (e) => {
         e.preventDefault();
     });
 
-    // Prevent pasting
     letterSpan.addEventListener('paste', (e) => {
         e.preventDefault();
     });
 
-    // Delete cell content on Backspace or Delete key press
     letterSpan.addEventListener("keydown", (e) => {
         if (e.key === "Backspace" || e.key === "Delete") {
             if (tileInstance.getData('newlyPlaced') !== "false") {
                 const letter = letterSpan.textContent;
-                if (letter) addTileToRack(letter); // Add the letter back to the rack
-                tileInstance.clear(); // Clear the tile
+                if (letter) addTileToRack(letter);
+                tileInstance.clear();
             }
-            e.preventDefault(); 
+            e.preventDefault();
             const currentRow = parseInt(tileInstance.getData('row'));
             const currentCol = parseInt(tileInstance.getData('col'));
-            const currentDirection = getDirection(); // Get the current direction from the indicator module
+            const currentDirection = getDirection();
             let nextTileInstance;
             if (currentDirection === 'right') {
                 nextTileInstance = getTileInstanceByCoords(currentRow, currentCol - 1);
@@ -107,15 +100,14 @@ squares.forEach(square => {
         }
     });
 
-      // Handle navigation with arrow keys
     letterSpan.addEventListener('keydown', (e) => {
         const currentRow = parseInt(tileInstance.getData('row'));
         const currentCol = parseInt(tileInstance.getData('col'));
-        const currentDirection = getDirection(); // Get the current direction from the indicator module
+        const currentDirection = getDirection();
         let newRow = currentRow;
         let newCol = currentCol;
         if (e.key === 'ArrowUp') {
-            setDirection('down'); 
+            setDirection('down');
             moveIndicator(tileInstance.getElement());
             newRow--;
         }
@@ -144,9 +136,8 @@ squares.forEach(square => {
         }
         else return;
     
-        e.preventDefault(); // Stop default scrolling
+        e.preventDefault();
     
-        // Clamp the coordinates within board bounds
         if (newRow < 0 || newRow >= rowLength || newCol < 0 || newCol >= columnLength) return;
     
         const nextTileInstance = getTileInstanceByCoords(newRow, newCol);
@@ -158,17 +149,16 @@ squares.forEach(square => {
 
     letterSpan.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-            submitButton.click(); // Trigger the submit button click event
-            e.preventDefault(); // Prevent the default action of the Enter key
+            submitButton.click();
+            e.preventDefault();
         }
     });
 
     letterSpan.addEventListener('blur', () => {
-        hideIndicator(); // Hide the indicator when the tile loses focus
+        hideIndicator();
     });
 });
 
-// Helper function to get tileInstance by row and col
 function getTileInstanceByCoords(row, col) {
     const tileElem = document.querySelector(`.tile[data-row='${row}'][data-col='${col}']`);
     if (!tileElem) return null;
@@ -194,6 +184,74 @@ function showError(msg) {
     }, 1600);
 }
 
+function exportBoardToBot() {
+    const board = getBoardAs2DArray();
+    const rack = getBotRackLetters();
+    console.log("Exporting board to bot:", board, rack, specialSquares);
+    fetch('/api/board', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ board, rack, specialSquares })
+    })
+    .then(response => response.json())
+    .then(data => {
+        const bestMove = data.moves;
+        console.log(bestMove);
+        placeBotMove(bestMove);
+    });
+}
+
+function placeBotMove(move) {
+    const { word, row, col, direction, rack_positions, validation_message, score } = move;
+    if (validation_message == "No valid moves found.") {
+        redrawBotRack();
+        showError("No valid moves found. Bot redrew its rack.");
+        return;
+    }
+    const rackSet = new Set(rack_positions.map(([r, c]) => `${r},${c}`));
+    for (let i = 0; i < word.length; i++) {
+        let r = row, c = col;
+        if (direction === 'horizontal') c += i;
+        else r += i;
+        if (rackSet.has(`${r},${c}`)) {
+            const tileElem = document.querySelector(`.tile[data-row='${r}'][data-col='${c}']`);
+            if (tileElem?.tileInstance) {
+                tileElem.tileInstance.setLetter(word[i]);
+                tileElem.classList.add('bot-played');
+                tileElem.classList.remove('empty');
+                tileElem.classList.add('filled');
+                tileElem.setAttribute('data-newly-placed', "false");
+                removeTileFromBotRack(word[i]);
+            }
+        }
+    }
+    drawBotRack();
+
+    const botScoreSpan = document.getElementById("bot-score");
+    botScoreSpan.textContent = `${parseInt(botScoreSpan.textContent) + score}`;
+}
+
+function handleEndOfGame() {
+    if (isGameOver()) {
+        const playerScore = parseInt(document.getElementById("score").textContent);
+        const botScore = parseInt(document.getElementById("bot-score").textContent);
+        if (playerScore > botScore) {
+            showError(`Game Over! You win with ${playerScore} points!`);
+        } 
+        else if (botScore > playerScore) {
+            showError(`Game Over! Bot wins with ${botScore} points!`);
+        } 
+        else {
+            showError("Game Over! It's a tie!");
+        }
+        document.getElementById("submit-button").disabled = true;
+        document.getElementById("redraw-button").disabled = true;
+        document.querySelectorAll('.rack .tile').forEach(tile => {
+            tile.setAttribute('disabled', 'true');
+        });
+    }
+}
+
 submitButton.addEventListener("click", () => {
     let placedTiles = []
     document.querySelectorAll('.tile[data-newly-placed="true"]').forEach(tileElem => {
@@ -210,35 +268,38 @@ submitButton.addEventListener("click", () => {
         if (validationResult.valid) {
             setFirstTurn(false);
         } else {
-            showError(validationResult.message); // Show error message to the user
+            showError(validationResult.message); 
             return;
         }
     }
     else {
         validationResult = validateSubsequentTurn(placedTiles);
         if (!validationResult.valid) {
-            showError(validationResult.message); // Show error message to the user
+            showError(validationResult.message); 
             return;
         }
     }
     placedTiles.forEach(tile => {
-        tile.instance.setData('newlyPlaced', "false"); // Mark the tile as not newly placed
+        tile.instance.setData('newlyPlaced', "false"); 
         tile.instance.getElement().classList.add('played');
         setTimeout(() => tile.instance.getElement().classList.remove('played'), 500);
         tile.instance.setData('newlyPlaced', "false");
     });
 
-    drawRack(); // Draw a new rack after the first turn
+    
     turn.textContent = `${parseInt(turn.textContent) + 1}` 
 
-    const score = validationResult.score; // Update the score
+    const score = validationResult.score; 
     const scoreSpan = document.getElementById("score");
-    scoreSpan.textContent = `${parseInt(scoreSpan.textContent) + score}`; // Update the score display 
+    scoreSpan.textContent = `${parseInt(scoreSpan.textContent) + score}`;
 
-    errorMessage.style.color = "green"; // Green for success
+    errorMessage.style.color = "green"; 
     showError(`${validationResult.message} (+${score} Points)`);
     
+    exportBoardToBot(); 
+    drawRack();
 
+    handleEndOfGame();
 });
 
 document.getElementById('redraw-button').addEventListener('click', () => {
@@ -247,7 +308,7 @@ document.getElementById('redraw-button').addEventListener('click', () => {
         const letter = tileInstance.getLetter();
         if (letter) {
             addTileToRack(letter);
-            tileInstance.clear(); // Clear the tile
+            tileInstance.clear();
         }
     });
 
@@ -261,17 +322,19 @@ document.getElementById('redraw-button').addEventListener('click', () => {
     selectedTiles.forEach(tileElem => {
         const tileInstance = tileElem.tileInstance;
         const letterSpan = tileInstance.getLetterSpan();
-        const letter = letterSpan.textContent[0]; // Assumes letter is first character
+        const letter = letterSpan.textContent[0];
         tileElem.classList.add('fading-out');
         setTimeout(() => {
             addTileToBag(letter);
-            removeTileFromRack(letter); // Remove the letter from the rackLetters array
+            removeTileFromRack(letter);
             completed++;
             if (completed === total) {
-                drawRack(); // Only redraw once, after all selected tiles are removed
+                drawRack();
             }
         }, 400);
     });
 
     turn.textContent = `${parseInt(turn.textContent) + 1}` 
+
+    exportBoardToBot();
 });
