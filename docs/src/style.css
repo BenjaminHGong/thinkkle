@@ -185,10 +185,22 @@
     background-color: #ffe066 !important;
 }
 
+.tile.bot-played {
+    animation: bot-played-glow 0.4s ease-in-out;
+    background-color: #e3f2fd !important;
+    box-shadow: 0 0.1em #6aa4d3;
+}
+
 @keyframes playedHighlight {
     0%   { box-shadow: 0 0.1em rgb(141, 114, 33); }
-    40%  { box-shadow: 0 0 16px 4px #ffe066; }
+    50%  { box-shadow: 0 0 16px 4px #ffe066; }
     100% { box-shadow: 0 0.1em rgb(141, 114, 33); }
+}
+
+@keyframes bot-played-glow {
+    0% { box-shadow: 0 0.1px #2196f3; }
+    50% { box-shadow: 0 0 16px 4px #2196f3; }
+    100% { box-shadow: 0 0 0.1em #2196f3; }
 }
 
 /* Rack styles */
