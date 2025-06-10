@@ -5,8 +5,8 @@ from itertools import permutations
 import time
 
 app = Flask(__name__, static_folder='../docs', static_url_path='')
-
 CORS(app)
+
 
 @app.route('/api/board', methods=['POST'])
 def receive_board():
@@ -487,20 +487,16 @@ def is_valid_placement(board, placed_tiles, dictionary : Trie, first_turn=False)
 
     return True, "Valid move."
 
-if __name__ == "__main__":
-    
-    print("Opening dictionary...")
-    dictionary = Trie()
-    try:
-        start_time = time.time()
-        with open("./docs/wordlist.txt", "r") as file:
-            for line in file: 
-                word = line.strip().upper()
-                dictionary.insert(word)
-        end_time = time.time()
-        print(f"Loading time: {round(end_time - start_time, 2)} seconds")
-    except Exception as e:
-        print(f"Error loading file: {e}")
-        exit()
-
-    app.run(host="0.0.0.0", port=5000, debug=True)
+print("Opening dictionary...")
+dictionary = Trie()
+try:
+    start_time = time.time()
+    with open("./docs/wordlist.txt", "r") as file:
+        for line in file: 
+            word = line.strip().upper()
+            dictionary.insert(word)
+    end_time = time.time()
+    print(f"Loading time: {round(end_time - start_time, 2)} seconds")
+except Exception as e:
+    print(f"Error loading file: {e}")
+    exit()
