@@ -55,7 +55,6 @@ export function drawBotRack() {
             availableLetters.splice(randomIndex, 1);
         }
     }
-    console.log("Bot Rack Letters:", botRackLetters);
     return botRackLetters;
 }
 
@@ -68,11 +67,11 @@ export function removeTileFromBotRack(letter) {
 
 export function redrawBotRack() {
     while (botRackLetters.length > 0) {
-        removeTileFromBotRack(botRackLetters[0]); 
-        addTileToBag(botRackLetters[0]); 
+        const letter = botRackLetters[0];
+        removeTileFromBotRack(letter); 
+        addTileToBag(letter); 
     }
     drawBotRack(); 
-    console.log("Bot redrew Rack Letters:", botRackLetters);
 }
 
 export function getRackLetters() {
@@ -139,5 +138,5 @@ export function isGameOver() {
     const playerRack = getRackLetters();
     const botRack = getBotRackLetters();
     const bagEmpty = Object.values(tileBag).every(count => count === 0);
-    return bagEmpty && playerRack.length === 0 && botRack.length === 0;
+    return bagEmpty && (playerRack.length === 0 || botRack.length === 0);
 }
