@@ -160,7 +160,6 @@ export function calculateWordScore(wordTiles) {
             else if (square.classList.contains('triple-letter')) {
                 letterMultiplier = 3;
             }
-
             
             if (square.classList.contains('double-word') || square.classList.contains('star')) {
                 wordMultiplier *= 2;
