@@ -1,6 +1,6 @@
 import { getDirection, setDirection, moveIndicator, hideIndicator } from "./indicator.js";
 import { getRackLetters, removeTileFromRack, addTileToRack, drawRack, addTileToBag, getBotRackLetters, redrawBotRack, removeTileFromBotRack, drawBotRack, isGameOver } from "./rack.js";
-import { rowLength, columnLength, specialSquares } from './constants.js';
+import { rowLength, columnLength, specialSquares, tileValues } from './constants.js';
 import { isFirstTurn, setFirstTurn, validateFirstTurn, validateSubsequentTurn} from "./wordutils.js";
 import { getBoardAs2DArray } from './board.js';
 const squares = document.querySelectorAll(".square");
@@ -187,7 +187,6 @@ function showError(msg) {
 function exportBoardToBot() {
     const board = getBoardAs2DArray();
     const rack = getBotRackLetters();
-    console.log("Exporting board to bot:", board, rack, specialSquares);
     fetch('/api/board', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -198,6 +197,7 @@ function exportBoardToBot() {
         const bestMove = data.moves;
         console.log(bestMove);
         placeBotMove(bestMove);
+        handleEndOfGame();
     });
 }
 
@@ -209,6 +209,7 @@ function placeBotMove(move) {
         return;
     }
     const rackSet = new Set(rack_positions.map(([r, c]) => `${r},${c}`));
+    let placedTiles = [];
     for (let i = 0; i < word.length; i++) {
         let r = row, c = col;
         if (direction === 'horizontal') c += i;
@@ -222,33 +223,74 @@ function placeBotMove(move) {
                 tileElem.classList.add('filled');
                 tileElem.setAttribute('data-newly-placed', "false");
                 removeTileFromBotRack(word[i]);
+                placedTiles.push(tileElem.tileInstance);
             }
         }
     }
+    placedTiles.forEach(tile => {
+        tile.setData('newlyPlaced', "false");
+        tile.getElement().classList.add('bot-animated');
+        setTimeout(() => tile.getElement().classList.remove('bot-animated'), 500);
+        tile.setData('newlyPlaced', "false");
+    });
     drawBotRack();
 
     const botScoreSpan = document.getElementById("bot-score");
     botScoreSpan.textContent = `${parseInt(botScoreSpan.textContent) + score}`;
 }
 
+function showGameOverPopup(title, message) {
+    const modal = document.getElementById("gameover-modal");
+    document.getElementById("gameover-title").textContent = title;
+    document.getElementById("gameover-message").textContent = message;
+    modal.style.display = "flex";
+    document.getElementById("gameover-close").onclick = () => {
+        modal.style.display = "none";
+    };
+}
+
 function handleEndOfGame() {
     if (isGameOver()) {
-        const playerScore = parseInt(document.getElementById("score").textContent);
-        const botScore = parseInt(document.getElementById("bot-score").textContent);
+        let playerScore = parseInt(document.getElementById("score").textContent);
+        let botScore = parseInt(document.getElementById("bot-score").textContent);
+        const playerRackTiles = getRackLetters();
+        const botRackTiles = getBotRackLetters();
+        const playerRackValue = playerRackTiles.reduce((sum, letter) => sum + tileValues[letter], 0);
+        const botRackValue = botRackTiles.reduce((sum, letter) => sum + tileValues[letter], 0);
+        if (playerRackTiles.length === 0 && botRackTiles.length > 0) {
+            playerScore += botRackValue;
+        }
+        else if (botRackTiles.length === 0 && playerRackTiles.length > 0) {
+            botScore += playerRackValue;
+        }
+        document.getElementById("score").textContent = playerScore;
+        document.getElementById("bot-score").textContent = botScore;
+
+        let title, message;
         if (playerScore > botScore) {
-            showError(`Game Over! You win with ${playerScore} points!`);
+            title = "You Win!";
+            message = `Game Over! You win with ${playerScore} points!`;
         } 
         else if (botScore > playerScore) {
-            showError(`Game Over! Bot wins with ${botScore} points!`);
+            title = "Bot Wins!";
+            message = `Game Over! Bot wins with ${botScore} points!`;
         } 
         else {
-            showError("Game Over! It's a tie!");
+            title = "It's a Tie!";
+            message = "Game Over! It's a tie!";
         }
+
+        showGameOverPopup(title, message);
         document.getElementById("submit-button").disabled = true;
         document.getElementById("redraw-button").disabled = true;
-        document.querySelectorAll('.rack .tile').forEach(tile => {
-            tile.setAttribute('disabled', 'true');
+        document.querySelectorAll('.square').forEach(square => {
+            const letterSpan = square.tileInstance.getLetterSpan();
+            letterSpan.contentEditable = false;
         });
+        return true
+    }
+    else {
+        return false;
     }
 }
 
@@ -295,11 +337,9 @@ submitButton.addEventListener("click", () => {
 
     errorMessage.style.color = "green"; 
     showError(`${validationResult.message} (+${score} Points)`);
-    
-    exportBoardToBot(); 
     drawRack();
-
-    handleEndOfGame();
+    if (handleEndOfGame()) return;
+    exportBoardToBot();
 });
 
 document.getElementById('redraw-button').addEventListener('click', () => {
@@ -335,6 +375,8 @@ document.getElementById('redraw-button').addEventListener('click', () => {
     });
 
     turn.textContent = `${parseInt(turn.textContent) + 1}` 
-
+    setFirstTurn(false);
+    if (handleEndOfGame()) return;
     exportBoardToBot();
+    
 });
