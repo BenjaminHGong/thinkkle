@@ -1,9 +1,12 @@
 from collections import defaultdict
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 from itertools import permutations
 import time
 
 app = Flask(__name__, static_folder='../docs', static_url_path='')
+
+CORS(app)
 
 @app.route('/api/board', methods=['POST'])
 def receive_board():
@@ -61,7 +64,8 @@ def get_moves(board, rack, special_squares=[]):
             valid_moves.append(move)
     
     valid_moves.sort(key=lambda m: m['score'], reverse=True)
-    print(valid_moves[0])
+    if valid_moves:
+        print(valid_moves[0])
     return valid_moves[0] if valid_moves else {'validation_message': 'No valid moves found.'}
 
 letter_scores = {
@@ -498,5 +502,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error loading file: {e}")
         exit()
-    
-    app.run(debug=True)
+
+    app.run(host="0.0.0.0", port=5000, debug=True)
