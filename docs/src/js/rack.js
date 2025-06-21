@@ -29,7 +29,6 @@ let tileBag = {
     'Z': 1
 };
 
-let availableLetters = Object.keys(tileBag).filter(letter => tileBag[letter] > 0);
 let rackLetters = []
 drawRack(); 
 let botRackLetters = [];
@@ -41,19 +40,17 @@ export function getBotRackLetters() {
 
 export function drawBotRack() {
     while (botRackLetters.length < 7) {
-        if (availableLetters.length === 0) break;
-        const randomIndex = Math.floor(Math.random() * availableLetters.length);
-        const letter = availableLetters[randomIndex];
-        if (tileBag[letter] > 0) {
-            botRackLetters.push(letter);
-            tileBag[letter]--;
-            if (tileBag[letter] === 0) {
-                availableLetters.splice(randomIndex, 1);
+        const weightedBag = [];
+        for (const letter in tileBag) {
+            for (let i = 0; i < tileBag[letter]; i++) {
+                weightedBag.push(letter);
             }
-        } 
-        else {
-            availableLetters.splice(randomIndex, 1);
         }
+        if (weightedBag.length === 0) break;
+        const randomIndex = Math.floor(Math.random() * weightedBag.length);
+        const letter = weightedBag[randomIndex];
+        botRackLetters.push(letter);
+        tileBag[letter]--;
     }
     return botRackLetters;
 }
@@ -81,27 +78,24 @@ export function getRackLetters() {
 export function drawRack() {
     const rack = document.querySelector('.rack');
     while (rackLetters.length < 7) {
-        if (availableLetters.length === 0) break; 
-        const randomIndex = Math.floor(Math.random() * availableLetters.length);
-        const letter = availableLetters[randomIndex];
-        if (tileBag[letter] > 0) {
-            rackLetters.push(letter);
-            tileBag[letter]--;
-            if (tileBag[letter] === 0) {
-                availableLetters.splice(randomIndex, 1); 
+        const weightedBag = [];
+        for (const letter in tileBag) {
+            for (let i = 0; i < tileBag[letter]; i++) {
+                weightedBag.push(letter);
             }
-            const tile = new Tile(letter);
-            rack.appendChild(tile.element);
-            tile.element.addEventListener('click', () => {
-                tile.element.classList.toggle('selected-for-redraw');
-            });
-            tile.element.classList.add('fading-in');
-            setTimeout(() => tile.element.classList.remove('fading-in'), 400);
-        } 
-        else {
-            
-            availableLetters.splice(randomIndex, 1);
         }
+        if (weightedBag.length === 0) break;
+        const randomIndex = Math.floor(Math.random() * weightedBag.length);
+        const letter = weightedBag[randomIndex];
+        rackLetters.push(letter);
+        tileBag[letter]--;
+        const tile = new Tile(letter);
+        rack.appendChild(tile.element);
+        tile.element.addEventListener('click', () => {
+            tile.element.classList.toggle('selected-for-redraw');
+        });
+        tile.element.classList.add('fading-in');
+        setTimeout(() => tile.element.classList.remove('fading-in'), 400);
     }
     return rackLetters;
 }
@@ -130,7 +124,6 @@ export function removeTileFromRack(letter) {
 export function addTileToBag(letter) {
     if (tileBag[letter] !== undefined) {
         tileBag[letter]++;
-        availableLetters.push(letter);
     }
 }
 
