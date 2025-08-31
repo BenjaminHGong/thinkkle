@@ -1,5 +1,4 @@
-docs/* linguist-documentation=false
-*.py linguist-language=Python
-*.js linguist-language=JavaScript
-*.css linguist-language=CSS
-*.html linguist-language=HTML
+*.py linguist-language=Python linguist-detectable=true
+*.js linguist-language=JavaScript linguist-detectable=true
+*.css linguist-language=CSS linguist-detectable=true
+*.html linguist-language=HTML linguist-detectable=true
