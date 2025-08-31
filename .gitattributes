@@ -1,3 +1,4 @@
+docs/* linguist-documentation=false
 *.py linguist-language=Python
 *.js linguist-language=JavaScript
 *.css linguist-language=CSS
