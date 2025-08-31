@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/benjaminhgong/thinkkle">
-    <img src="thinkkle/docs/android-chrome-512x512.png" alt="Logo" width="80" height="80">
+    <img src="thinkkle/docs/public/android-chrome-512x512.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Thinkkle</h3>
@@ -70,7 +70,6 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -83,7 +82,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Thinkkle Screenshot][product-screenshot]](https://thinkkle.onrender.com/)
 
 Thinkkle is a full-stack web app where you play a Scrabble-style game against a rule-based Python AI. The app combines a Flask backend (for AI/game logic) with a simple HTML/CSS/JavaScript frontend.
 
@@ -108,7 +107,7 @@ This guide will help you run the Thinkkle website and bot locally on your machin
 
 ### Prerequisites
 
-* Python 3.8+
+* [Python 3.8+](https://www.python.org/downloads/)
 
 ### Installation
 
@@ -200,7 +199,7 @@ Project Link: [https://github.com/benjaminhgong/thinkkle](https://github.com/ben
 
 * [Scrabulizer](https://www.scrabulizer.com/)
 * [MDN Web Docs](https://developer.mozilla.org/en-US/)
-* []()
+* [Othneil Drew](https://github.com/othneildrew)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
