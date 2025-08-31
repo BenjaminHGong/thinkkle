@@ -1,5 +1,1 @@
-docs/* linguist-detectable
-*.py linguist-language=Python linguist-detectable
-*.js linguist-language=JavaScript linguist-detectable
-*.css linguist-language=CSS linguist-detectable
-*.html linguist-language=HTML linguist-detectable
+docs/** linguist-documentation=false
