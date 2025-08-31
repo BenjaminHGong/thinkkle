@@ -31,7 +31,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/benjaminhgong/thinkkle">
-    <img src="thinkkle/docs/public/android-chrome-512x512.png" alt="Logo" width="80" height="80">
+    <img src="docs/public/android-chrome-512x512.png" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Thinkkle</h3>
