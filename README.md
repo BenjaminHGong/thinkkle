@@ -42,7 +42,7 @@
     <a href="https://github.com/benjaminhgong/thinkkle"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/benjaminhgong/thinkkle">View Demo</a>
+    <a href="https://thinkkle.onrender.com">View Demo</a>
     &middot;
     <a href="https://github.com/benjaminhgong/thinkkle/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
@@ -140,9 +140,7 @@ open your browser and go to:
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+Click on the board to select a square. Type in the letters on your rack to play a word. Use the arrow keys to change the direction and selected square. Press Enter to submit your move.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
